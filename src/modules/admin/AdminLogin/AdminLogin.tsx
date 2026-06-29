@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet-async';
 import { Button, Input } from '@shared/components';
 import { useAdminLogin } from '@/hooks/useAuth';
 import styles from './AdminLogin.module.css';
+import { useRef } from 'react';
 
 const adminLoginSchema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -24,6 +25,35 @@ export default function AdminLogin() {
     resolver: zodResolver(adminLoginSchema),
   });
 
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+  if (e.key !== 'Tab') return;
+
+  const focusable = formRef.current?.querySelectorAll<HTMLElement>(
+    'input:not([disabled]), button:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+  );
+
+  if (!focusable || focusable.length === 0) return;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (!first || !last) return;
+
+  if (e.shiftKey) {
+    if (document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    }
+  } else {
+    if (document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+};
+
   const onSubmit = (data: AdminLoginForm) => {
     login(data);
   };
@@ -40,12 +70,13 @@ export default function AdminLogin() {
             <h1 className={styles.title}>Sign in</h1>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+          <form ref={formRef}  onSubmit={handleSubmit(onSubmit)} className={styles.form} onKeyDown={handleKeyDown}>
             <Input
               label="Email"
               type="email"
               placeholder="admin@store.com"
               autoComplete="email"
+              autoFocus
               error={errors.email?.message}
               {...register('email')}
             />

@@ -9,6 +9,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Button, Badge, Spinner, Input } from '@shared/components';
 import styles from './Products.module.css';
+import { getStatusBadgeVariant } from '@/shared/utils/badge';
 
 export default function Products() {
   const [page, setPage] = useState(1);
@@ -31,6 +32,28 @@ export default function Products() {
       toast.error('Failed to update status');
     }
   };
+
+  const confirmDelete = (
+  e: React.MouseEvent,
+  productId: string,
+  productName: string,
+) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  toast("Delete product?", {
+    description: `This will permanently delete "${productName}".`,
+    action: {
+      label: "Delete",
+      onClick: () => deleteProduct(productId),
+    },
+    cancel: {
+      label: "Cancel",
+      onClick: () => {},
+    },
+    duration: 10000,
+  });
+};
 
   return (
     <>
@@ -77,7 +100,7 @@ export default function Products() {
                 </div>
                 <span>₹{p.basePrice.toLocaleString('en-IN')}</span>
                 <span className={styles.gst}>{p.gstRate}%</span>
-                <Badge variant={p.status === 'Active' ? 'success' : p.status === 'Out of Stock' ? 'error' : 'default'}>
+                <Badge variant={getStatusBadgeVariant(p.status)}>
                   {p.status}
                 </Badge>
                 <span>{p.totalSold}</span>
@@ -91,7 +114,7 @@ export default function Products() {
                 </button>
                 <button
                   className={styles.deleteBtn}
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); deleteProduct(p._id); }}
+                  onClick={(e) => confirmDelete(e, p._id, p.name)}
                   aria-label="Delete product"
                 >
                   <Trash2 size={14} />

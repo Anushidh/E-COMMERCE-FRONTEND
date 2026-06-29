@@ -9,6 +9,7 @@ import { useCreateProduct } from '@/hooks/useAdmin';
 import { useCategories } from '@/hooks/useCategories';
 import { useState } from 'react';
 import styles from './ProductCreate.module.css';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 const productSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -33,6 +34,8 @@ export default function ProductCreate() {
     defaultValues: { gender: 'Unisex', gstRate: 18 },
   });
 
+  const { ref: formRef, handleKeyDown } = useFocusTrap<HTMLFormElement>();
+
   const onSubmit = (data: ProductForm) => {
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
@@ -56,11 +59,11 @@ export default function ProductCreate() {
           <h1 className={styles.title}>New Product</h1>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+        <form ref={formRef} onKeyDown={handleKeyDown} onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <div className={styles.card}>
             <h2 className={styles.cardTitle}>General Information</h2>
             <div className={styles.grid}>
-              <Input label="Product Name" error={errors.name?.message} {...register('name')} />
+              <Input label="Product Name" error={errors.name?.message} autoFocus {...register('name')} />
               <Input label="Brand (optional)" {...register('brand')} />
             </div>
             <div className={styles.textareaWrapper}>

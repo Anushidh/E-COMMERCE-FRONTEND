@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { adminService } from '@/services/admin.service';
 import { Button, Badge, Spinner, Input, Modal } from '@shared/components';
 import styles from './Categories.module.css';
+import { getGenderBadgeVariant } from '@/shared/utils/badge';
 
 const categorySchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -101,7 +102,7 @@ export default function Categories() {
                 <div className={styles.cardBody}>
                   <div className={styles.cardInfo}>
                     <h3 className={styles.cardName}>{cat.name}</h3>
-                    <Badge variant="default">{cat.gender}</Badge>
+                    <Badge variant={getGenderBadgeVariant(cat.gender)}>{cat.gender}</Badge>
                   </div>
                   {cat.description && <p className={styles.cardDesc}>{cat.description}</p>}
                   <button

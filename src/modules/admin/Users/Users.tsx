@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { useAdminUsers, useBlockUser, useUnblockUser } from '@/hooks/useAdmin';
 import { Button, Badge, Spinner, Input } from '@shared/components';
 import styles from './Users.module.css';
+import { getUserStatusBadgeVariant } from '@/shared/utils/badge';
 
 export default function Users() {
   const [page, setPage] = useState(1);
@@ -35,7 +36,7 @@ export default function Users() {
               <div key={user._id} className={styles.tableRow}>
                 <span className={styles.name}>{user.name}</span>
                 <span className={styles.email}>{user.email}</span>
-                <Badge variant={user.isBlocked ? 'error' : 'success'}>{user.isBlocked ? 'Blocked' : 'Active'}</Badge>
+                <Badge variant={getUserStatusBadgeVariant(user.isBlocked)}>{user.isBlocked ? 'Blocked' : 'Active'}</Badge>
                 <span>{new Date(user.createdAt).toLocaleDateString('en-IN')}</span>
                 <div>
                   {user.isBlocked

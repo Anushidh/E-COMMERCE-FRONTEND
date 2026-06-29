@@ -10,14 +10,19 @@ interface ModalProps {
   description?: string;
   children: ReactNode;
   size?: 'sm' | 'md' | 'lg';
+  closeOnOutsideClick?: boolean;
 }
 
-export function Modal({ open, onClose, title, description, children, size = 'md' }: ModalProps) {
+export function Modal({ open, onClose, title, description, children, size = 'md', closeOnOutsideClick = false, }: ModalProps) {
   return (
     <Dialog.Root open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className={styles.overlay} />
-        <Dialog.Content className={`${styles.content} ${styles[size]}`}>
+        <Dialog.Content className={`${styles.content} ${styles[size]}`} onPointerDownOutside={(e) => {
+    if (!closeOnOutsideClick) {
+      e.preventDefault();
+    }
+  }}>
           {title && (
             <Dialog.Title className={styles.title}>{title}</Dialog.Title>
           )}

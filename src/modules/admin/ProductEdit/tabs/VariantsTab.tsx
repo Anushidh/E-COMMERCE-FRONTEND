@@ -9,6 +9,7 @@ import { Button, Input, Badge } from '@shared/components';
 import { adminService } from '@/services/admin.service';
 import type { Variant } from '@shared/types/product';
 import styles from './Tabs.module.css';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 const variantSchema = z.object({
   size: z.string().min(1, 'Size required'),
@@ -34,6 +35,8 @@ export function VariantsTab({ productId, variants }: VariantsTabProps) {
   const { register, handleSubmit, reset, formState: { errors } } = useForm<VariantForm>({
     resolver: zodResolver(variantSchema),
   });
+
+  const { ref: formRef, handleKeyDown } = useFocusTrap<HTMLFormElement>();
 
   const onAdd = async (data: VariantForm) => {
     try {
@@ -83,9 +86,9 @@ export function VariantsTab({ productId, variants }: VariantsTabProps) {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit(onAdd)} className={styles.variantForm}>
+        <form ref={formRef} onKeyDown={handleKeyDown} onSubmit={handleSubmit(onAdd)} className={styles.variantForm}>
           <div className={styles.variantFormGrid}>
-            <Input label="Size" placeholder="M" error={errors.size?.message} {...register('size')} />
+            <Input label="Size" placeholder="M" error={errors.size?.message} autoFocus {...register('size')} />
             <Input label="Color" placeholder="Black" error={errors.color?.message} {...register('color')} />
             <Input label="Stock" type="number" placeholder="0" error={errors.stock?.message} {...register('stock')} />
             <Input label="Price (optional)" type="number" placeholder="Override" {...register('price')} />

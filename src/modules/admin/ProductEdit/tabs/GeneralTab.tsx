@@ -9,6 +9,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { Product } from '@shared/types/product';
 import styles from './Tabs.module.css';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 const schema = z.object({
   name: z.string().min(2),
@@ -42,6 +43,8 @@ export function GeneralTab({ product }: { product: Product }) {
     },
   });
 
+  const { ref: formRef, handleKeyDown } = useFocusTrap<HTMLFormElement>();
+
   const onSubmit = async (data: FormData) => {
     setSaving(true);
     try {
@@ -62,9 +65,9 @@ export function GeneralTab({ product }: { product: Product }) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+    <form ref={formRef} onKeyDown={handleKeyDown} onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <div className={styles.grid}>
-        <Input label="Name" error={errors.name?.message} {...register('name')} />
+        <Input label="Name" error={errors.name?.message} autoFocus {...register('name')} />
         <Input label="Brand" {...register('brand')} />
       </div>
       <div className={styles.fieldWrap}>

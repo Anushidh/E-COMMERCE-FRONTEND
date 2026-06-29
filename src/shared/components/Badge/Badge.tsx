@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import styles from './Badge.module.css';
 
-type BadgeVariant = 'default' | 'success' | 'warning' | 'error' | 'info';
+export type BadgeVariant = 'default' | 'success' | 'warning' | 'error' | 'info';
 
 interface BadgeProps {
   variant?: BadgeVariant;
