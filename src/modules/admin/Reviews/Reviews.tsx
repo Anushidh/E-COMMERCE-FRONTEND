@@ -4,7 +4,7 @@ import { Trash2, Star } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { apiClient } from '@shared/api/client';
-import { Button, ListSkeleton, ConfirmDialog } from '@shared/components';
+import { Button, ListSkeleton, ConfirmDialog, Select } from '@shared/components';
 import { useProducts } from '@/hooks/useProducts';
 import styles from './Reviews.module.css';
 
@@ -41,16 +41,15 @@ export default function Reviews() {
       <div className={styles.page}>
         <div className={styles.header}>
           <h1 className={styles.title}>Review Moderation</h1>
-          <select
-            className={styles.productSelect}
-            value={selectedProduct}
-            onChange={(e) => { setSelectedProduct(e.target.value); setPage(1); }}
-          >
-            <option value="">Select a product</option>
-            {productsData?.products.map((p) => (
-              <option key={p._id} value={p._id}>{p.name}</option>
-            ))}
-          </select>
+          <div className={styles.productSelect}>
+            <Select
+              options={productsData?.products.map((p) => ({ label: p.name, value: p._id })) || []}
+              value={selectedProduct}
+              onChange={(v) => { setSelectedProduct(v); setPage(1); }}
+              placeholder="Select a product"
+              fullWidth={false}
+            />
+          </div>
         </div>
 
         {!selectedProduct ? (

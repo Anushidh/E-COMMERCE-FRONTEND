@@ -2,11 +2,22 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router';
 import { useAdminOrders, useUpdateOrderStatus, useHandleReturn } from '@/hooks/useAdmin';
-import { Button, Badge, TableSkeleton } from '@shared/components';
+import { Button, Badge, TableSkeleton, Select } from '@shared/components';
 import { getOrderStatusBadgeVariant } from '@/shared/utils/badge';
 import styles from './Orders.module.css';
 
-const STATUSES = ['', 'Placed', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Return Requested', 'Returned'];
+const STATUS_OPTIONS = [
+  { label: 'All statuses', value: '' },
+  { label: 'Placed', value: 'Placed' },
+  { label: 'Confirmed', value: 'Confirmed' },
+  { label: 'Shipped', value: 'Shipped' },
+  { label: 'Out for Delivery', value: 'Out for Delivery' },
+  { label: 'Delivered', value: 'Delivered' },
+  { label: 'Cancelled', value: 'Cancelled' },
+  { label: 'Return Requested', value: 'Return Requested' },
+  { label: 'Returned', value: 'Returned' },
+];
+
 const NEXT_STATUS: Record<string, string[]> = {
   'Placed': ['Confirmed', 'Cancelled'],
   'Confirmed': ['Shipped', 'Cancelled'],
@@ -27,18 +38,18 @@ export default function Orders() {
       <div className={styles.page}>
         <div className={styles.header}>
           <h1 className={styles.title}>Orders</h1>
-          <select
-            className={styles.filter}
-            value={statusFilter}
-            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-          >
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>{s || 'All statuses'}</option>
-            ))}
-          </select>
+          <div className={styles.filterWrapper}>
+            <Select
+              options={STATUS_OPTIONS}
+              value={statusFilter}
+              onChange={(v) => { setStatusFilter(v); setPage(1); }}
+              placeholder="All statuses"
+              fullWidth={false}
+            />
+          </div>
         </div>
 
-        {isLoading ? <TableSkeleton columns={5} gridTemplate="140px 1fr 100px 130px 1fr" /> : (
+        {isLoading ? <TableSkeleton columns={5} gridTemplate="130px 1fr 100px 120px 200px" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
               <span>Order ID</span>

@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Plus, Trash2, Pencil } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useCategories } from '@/hooks/useCategories';
@@ -9,7 +9,7 @@ import { useCreateCategory, useDeleteCategory } from '@/hooks/useAdmin';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { adminService } from '@/services/admin.service';
-import { Button, Badge, CardGridSkeleton, Input, Modal, ConfirmDialog } from '@shared/components';
+import { Button, Badge, CardGridSkeleton, Input, Modal, ConfirmDialog, Select } from '@shared/components';
 import styles from './Categories.module.css';
 import { getGenderBadgeVariant } from '@/shared/utils/badge';
 
@@ -34,7 +34,7 @@ export default function Categories() {
   const { mutate: deleteCategory } = useDeleteCategory();
   const qc = useQueryClient();
 
-  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<CategoryForm>({
+  const { register, handleSubmit, reset, watch, control, formState: { errors } } = useForm<CategoryForm>({
     resolver: zodResolver(categorySchema),
     defaultValues: { name: '', description: '', gender: 'Both' },
   });
@@ -46,9 +46,9 @@ export default function Categories() {
   // Track original values for edit form comparison
   const editOriginal = useRef<CategoryForm | null>(null);
 
-  // Create form: check if any field has a value
+  // Create form: check if any field has a value or was changed from default
   const createValues = watch();
-  const isCreateDirty = !!(createValues.name || createValues.description) || imageFile !== null;
+  const isCreateDirty = !!(createValues.name || createValues.description) || createValues.gender !== 'Both' || imageFile !== null;
 
   // Edit form: check if any value differs from original
   const editValues = editForm.watch();
@@ -160,14 +160,22 @@ export default function Categories() {
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <Input label="Name" placeholder="T-Shirts" error={errors.name?.message} {...register('name')} />
           <Input label="Description (optional)" placeholder="Short description" {...register('description')} />
-          <div className={styles.fieldWrap}>
-            <label className={styles.label}>Gender</label>
-            <select className={styles.select} {...register('gender')}>
-              <option value="Both">Both</option>
-              <option value="Men">Men</option>
-              <option value="Women">Women</option>
-            </select>
-          </div>
+          <Controller
+            name="gender"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Gender"
+                options={[
+                  { label: 'Both', value: 'Both' },
+                  { label: 'Men', value: 'Men' },
+                  { label: 'Women', value: 'Women' },
+                ]}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
           <div className={styles.fieldWrap}>
             <label className={styles.label}>Image (optional)</label>
             <input
@@ -188,14 +196,22 @@ export default function Categories() {
         <form onSubmit={editForm.handleSubmit(onEdit)} className={styles.form}>
           <Input label="Name" error={editForm.formState.errors.name?.message} {...editForm.register('name')} />
           <Input label="Description (optional)" {...editForm.register('description')} />
-          <div className={styles.fieldWrap}>
-            <label className={styles.label}>Gender</label>
-            <select className={styles.select} {...editForm.register('gender')}>
-              <option value="Both">Both</option>
-              <option value="Men">Men</option>
-              <option value="Women">Women</option>
-            </select>
-          </div>
+          <Controller
+            name="gender"
+            control={editForm.control}
+            render={({ field }) => (
+              <Select
+                label="Gender"
+                options={[
+                  { label: 'Both', value: 'Both' },
+                  { label: 'Men', value: 'Men' },
+                  { label: 'Women', value: 'Women' },
+                ]}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
           <div className={styles.fieldWrap}>
             <label className={styles.label}>New Image (optional)</label>
             <input type="file" accept="image/*" onChange={(e) => setEditImageFile(e.target.files?.[0] || null)} className={styles.fileInput} />

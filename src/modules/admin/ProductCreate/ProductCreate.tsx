@@ -1,9 +1,9 @@
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router';
-import { Button, Input, BackButton, ConfirmDialog } from '@shared/components';
+import { Button, Input, BackButton, ConfirmDialog, Select } from '@shared/components';
 import { useCreateProduct } from '@/hooks/useAdmin';
 import { useCategories } from '@/hooks/useCategories';
 import { useState } from 'react';
@@ -29,14 +29,17 @@ export default function ProductCreate() {
   const [images, setImages] = useState<File[]>([]);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<ProductForm>({
+  const { register, handleSubmit, watch, control, formState: { errors } } = useForm<ProductForm>({
     resolver: zodResolver(productSchema),
     defaultValues: { name: '', description: '', brand: '', category: '', gender: 'Unisex', basePrice: 0, gstRate: 18 },
   });
 
   // Check if any field has a meaningful value
   const productValues = watch();
-  const isProductDirty = !!(productValues.name || productValues.description || productValues.brand || productValues.category) || images.length > 0;
+  const isProductDirty = !!(
+    productValues.name || productValues.description || productValues.brand || productValues.category ||
+    productValues.basePrice
+  ) || productValues.gender !== 'Unisex' || productValues.gstRate !== 18 || images.length > 0;
 
   const { ref: formRef, handleKeyDown } = useFocusTrap<HTMLFormElement>();
 
@@ -58,7 +61,6 @@ export default function ProductCreate() {
       <div className={styles.page}>
         <div className={styles.header}>
           <BackButton to="/admin/products" label="Back" isDirty={isProductDirty} />
-          <h1 className={styles.title}>New Product</h1>
         </div>
 
         <form ref={formRef} onKeyDown={handleKeyDown} onSubmit={handleSubmit(onSubmit)} className={styles.form}>
@@ -74,24 +76,12 @@ export default function ProductCreate() {
               {errors.description && <p className={styles.error}>{errors.description.message}</p>}
             </div>
             <div className={styles.grid}>
-              <div className={styles.selectWrapper}>
-                <label className={styles.label}>Category</label>
-                <select className={styles.select} {...register('category')}>
-                  <option value="">Select category</option>
-                  {categories?.map((c) => (
-                    <option key={c._id} value={c._id}>{c.name}</option>
-                  ))}
-                </select>
-                {errors.category && <p className={styles.error}>{errors.category.message}</p>}
-              </div>
-              <div className={styles.selectWrapper}>
-                <label className={styles.label}>Gender</label>
-                <select className={styles.select} {...register('gender')}>
-                  <option value="Men">Men</option>
-                  <option value="Women">Women</option>
-                  <option value="Unisex">Unisex</option>
-                </select>
-              </div>
+              <Controller name="category" control={control} render={({ field }) => (
+                <Select label="Category" placeholder="Select category" options={categories?.map((c) => ({ label: c.name, value: c._id })) || []} value={field.value} onChange={field.onChange} error={errors.category?.message} />
+              )} />
+              <Controller name="gender" control={control} render={({ field }) => (
+                <Select label="Gender" options={[{ label: 'Men', value: 'Men' }, { label: 'Women', value: 'Women' }, { label: 'Unisex', value: 'Unisex' }]} value={field.value} onChange={field.onChange} />
+              )} />
             </div>
           </div>
 
@@ -99,16 +89,9 @@ export default function ProductCreate() {
             <h2 className={styles.cardTitle}>Pricing</h2>
             <div className={styles.grid}>
               <Input label="Base Price (₹)" type="number" error={errors.basePrice?.message} {...register('basePrice')} />
-              <div className={styles.selectWrapper}>
-                <label className={styles.label}>GST Rate</label>
-                <select className={styles.select} {...register('gstRate')}>
-                  <option value="0">0%</option>
-                  <option value="5">5%</option>
-                  <option value="12">12%</option>
-                  <option value="18">18%</option>
-                  <option value="28">28%</option>
-                </select>
-              </div>
+              <Controller name="gstRate" control={control} render={({ field }) => (
+                <Select label="GST Rate" options={[{ label: '0%', value: '0' }, { label: '5%', value: '5' }, { label: '12%', value: '12' }, { label: '18%', value: '18' }, { label: '28%', value: '28' }]} value={String(field.value)} onChange={(v) => field.onChange(Number(v))} />
+              )} />
             </div>
           </div>
 

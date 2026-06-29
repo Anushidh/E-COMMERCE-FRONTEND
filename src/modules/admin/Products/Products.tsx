@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router';
-import { Plus, Trash2, Search, Power } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useDeleteProduct } from '@/hooks/useAdmin';
+import { useDebounce } from '@/hooks/useDebounce';
 import { adminService } from '@/services/admin.service';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -14,8 +15,9 @@ import { getStatusBadgeVariant } from '@/shared/utils/badge';
 export default function Products() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
-  const { data, isLoading } = useProducts({ page: String(page), limit: '20', search: search || undefined });
+  const { data, isLoading } = useProducts({ page: String(page), limit: '20', search: debouncedSearch || undefined, status: 'all' });
   const { mutate: deleteProduct } = useDeleteProduct();
   const qc = useQueryClient();
 
@@ -35,14 +37,14 @@ export default function Products() {
   };
 
   const confirmDelete = (
-  e: React.MouseEvent,
-  productId: string,
-  productName: string,
-) => {
-  e.preventDefault();
-  e.stopPropagation();
-  setDeleteTarget({ id: productId, name: productName });
-};
+    e: React.MouseEvent,
+    productId: string,
+    productName: string,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDeleteTarget({ id: productId, name: productName });
+  };
 
   return (
     <>
@@ -66,17 +68,18 @@ export default function Products() {
         </div>
 
         {isLoading ? (
-          <TableSkeleton columns={7} gridTemplate="50px 1fr 90px 50px 100px 60px 60px" />
+          <TableSkeleton columns={8} gridTemplate="50px 1fr 90px 80px 60px 50px 90px 180px" />
         ) : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
               <span></span>
               <span>Product</span>
+              <span>Category</span>
               <span>Price</span>
-              <span>GST</span>
-              <span>Status</span>
+              <span>Rating</span>
               <span>Sold</span>
-              <span></span>
+              <span>Status</span>
+              <span>Actions</span>
             </div>
             {data?.products.map((p) => (
               <Link to={`/admin/products/${p._id}`} key={p._id} className={styles.tableRow}>
@@ -87,27 +90,20 @@ export default function Products() {
                   <span className={styles.productName}>{p.name}</span>
                   <span className={styles.productBrand}>{p.brand || '—'}</span>
                 </div>
+                <span className={styles.category}>{typeof p.category === 'object' ? p.category.name : '—'}</span>
                 <span>₹{p.basePrice.toLocaleString('en-IN')}</span>
-                <span className={styles.gst}>{p.gstRate}%</span>
+                <span className={styles.rating}>{p.averageRating > 0 ? `★ ${p.averageRating.toFixed(1)}` : '—'}</span>
+                <span>{p.totalSold}</span>
                 <Badge variant={getStatusBadgeVariant(p.status)}>
                   {p.status}
                 </Badge>
-                <span>{p.totalSold}</span>
-                <button
-                  className={styles.toggleBtn}
-                  onClick={(e) => toggleStatus(e, p._id, p.status)}
-                  aria-label={p.status === 'Active' ? 'Deactivate' : 'Activate'}
-                  title={p.status === 'Active' ? 'Deactivate' : 'Activate'}
-                >
-                  <Power size={14} />
-                </button>
-                <button
-                  className={styles.deleteBtn}
-                  onClick={(e) => confirmDelete(e, p._id, p.name)}
-                  aria-label="Delete product"
-                >
-                  <Trash2 size={14} />
-                </button>
+                <div className={styles.actions}>
+                  {p.status === 'Active'
+                    ? <Button size="sm" variant="secondary" onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleStatus(e, p._id, p.status); }}>Deactivate</Button>
+                    : <Button size="sm" variant="secondary" onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleStatus(e, p._id, p.status); }}>Activate</Button>
+                  }
+                  <Button size="sm" variant="danger" onClick={(e) => { e.preventDefault(); e.stopPropagation(); confirmDelete(e, p._id, p.name); }}>Delete</Button>
+                </div>
               </Link>
             ))}
             {data?.products.length === 0 && (

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useAdminUsers, useBlockUser, useUnblockUser } from '@/hooks/useAdmin';
+import { useDebounce } from '@/hooks/useDebounce';
 import { Button, Badge, TableSkeleton, Input } from '@shared/components';
 import styles from './Users.module.css';
 import { getUserStatusBadgeVariant } from '@/shared/utils/badge';
@@ -8,7 +9,8 @@ import { getUserStatusBadgeVariant } from '@/shared/utils/badge';
 export default function Users() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const { data, isLoading } = useAdminUsers({ page, search: search || undefined });
+  const debouncedSearch = useDebounce(search);
+  const { data, isLoading } = useAdminUsers({ page, search: debouncedSearch || undefined });
   const { mutate: block } = useBlockUser();
   const { mutate: unblock } = useUnblockUser();
 
@@ -23,11 +25,13 @@ export default function Users() {
           </div>
         </div>
 
-        {isLoading ? <TableSkeleton columns={5} gridTemplate="1fr 1fr 90px 100px 90px" /> : (
+        {isLoading ? <TableSkeleton columns={7} gridTemplate="1fr 1fr 130px 80px 80px 100px 100px" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
               <span>Name</span>
               <span>Email</span>
+              <span>Phone</span>
+              <span>Verified</span>
               <span>Status</span>
               <span>Joined</span>
               <span>Action</span>
@@ -36,6 +40,8 @@ export default function Users() {
               <div key={user._id} className={styles.tableRow}>
                 <span className={styles.name}>{user.name}</span>
                 <span className={styles.email}>{user.email}</span>
+                <span className={styles.phone}>{user.phone || '—'}</span>
+                <Badge variant={user.isVerified ? 'success' : 'default'}>{user.isVerified ? 'Yes' : 'No'}</Badge>
                 <Badge variant={getUserStatusBadgeVariant(user.isBlocked)}>{user.isBlocked ? 'Blocked' : 'Active'}</Badge>
                 <span>{new Date(user.createdAt).toLocaleDateString('en-IN')}</span>
                 <div>

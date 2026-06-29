@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Plus, Trash2 } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAdminCoupons, useCreateCoupon, useDeleteCoupon } from '@/hooks/useAdmin';
-import { Button, Badge, TableSkeleton, Input, Modal, ConfirmDialog } from '@shared/components';
+import { Button, Badge, TableSkeleton, Input, Modal, ConfirmDialog, DatePicker, Select } from '@shared/components';
 import { getOfferStatusBadgeVariant } from '@/shared/utils/badge';
 import styles from './Coupons.module.css';
 
@@ -30,13 +30,17 @@ export default function Coupons() {
   const { mutate: create, isPending: creating } = useCreateCoupon();
   const { mutate: deleteCoupon } = useDeleteCoupon();
 
-  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<CouponForm>({
+  const { register, handleSubmit, reset, watch, control, formState: { errors } } = useForm<CouponForm>({
     resolver: zodResolver(couponSchema),
   });
 
   // Check if any field has a value for create form
   const couponValues = watch();
-  const isCouponDirty = !!(couponValues.code || couponValues.discountValue || couponValues.totalUsageLimit || couponValues.expiryDate);
+  const isCouponDirty = !!(
+    couponValues.code || couponValues.discountValue || couponValues.totalUsageLimit ||
+    couponValues.expiryDate || couponValues.minOrderValue || couponValues.maxDiscount ||
+    couponValues.usageLimitPerUser
+  ) || (couponValues.discountType && couponValues.discountType !== 'percentage');
 
   const onSubmit = (data: CouponForm) => {
     create(data, { onSuccess: () => { reset(); setShowCreate(false); } });
@@ -51,7 +55,7 @@ export default function Coupons() {
           <Button size="sm" leftIcon={<Plus size={14} />} onClick={() => setShowCreate(true)}>Create</Button>
         </div>
 
-        {isLoading ? <TableSkeleton columns={7} gridTemplate="120px 90px 80px 80px 100px 80px 40px" /> : (
+        {isLoading ? <TableSkeleton columns={7} gridTemplate="1fr 100px 100px 100px 120px 90px 50px" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
               <span>Code</span><span>Type</span><span>Value</span><span>Used</span><span>Expiry</span><span>Status</span><span></span>
@@ -79,13 +83,9 @@ export default function Coupons() {
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <Input label="Code" placeholder="SAVE20" error={errors.code?.message} {...register('code')} />
           <div className={styles.row}>
-            <div className={styles.selectWrapper}>
-              <label className={styles.label}>Type</label>
-              <select className={styles.select} {...register('discountType')}>
-                <option value="percentage">Percentage</option>
-                <option value="flat">Flat</option>
-              </select>
-            </div>
+            <Controller name="discountType" control={control} render={({ field }) => (
+              <Select label="Type" options={[{ label: 'Percentage', value: 'percentage' }, { label: 'Flat', value: 'flat' }]} value={field.value} onChange={field.onChange} />
+            )} />
             <Input label="Value" type="number" error={errors.discountValue?.message} {...register('discountValue')} />
           </div>
           <div className={styles.row}>
@@ -96,7 +96,9 @@ export default function Coupons() {
             <Input label="Per User Limit" type="number" {...register('usageLimitPerUser')} />
             <Input label="Total Limit" type="number" error={errors.totalUsageLimit?.message} {...register('totalUsageLimit')} />
           </div>
-          <Input label="Expiry Date" type="date" error={errors.expiryDate?.message} {...register('expiryDate')} />
+          <Controller name="expiryDate" control={control} render={({ field }) => (
+            <DatePicker label="Expiry Date" value={field.value} onChange={field.onChange} error={errors.expiryDate?.message} />
+          )} />
           <Button type="submit" fullWidth loading={creating}>Create Coupon</Button>
         </form>
       </Modal>

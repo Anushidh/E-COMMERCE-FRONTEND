@@ -26,10 +26,12 @@ export function Providers({ children }: ProvidersProps) {
           {children}
           <Toaster
             position="bottom-right"
+            closeButton
             toastOptions={{
               style: {
                 fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-sm)',
+                fontSize: 'var(--text-base)',
+                padding: '16px 20px',
               },
             }}
           />

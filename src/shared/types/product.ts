@@ -45,6 +45,7 @@ export interface ProductOffer {
 export interface ProductFilters {
   category?: string;
   gender?: 'Men' | 'Women' | 'Unisex';
+  status?: 'Active' | 'Inactive' | 'Out of Stock' | 'all';
   minPrice?: string;
   maxPrice?: string;
   size?: string;

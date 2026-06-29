@@ -14,6 +14,7 @@ interface ModalProps {
 }
 
 export function Modal({ open, onClose, title, description, children, size = 'md', closeOnOutsideClick = false, }: ModalProps) {
+
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';

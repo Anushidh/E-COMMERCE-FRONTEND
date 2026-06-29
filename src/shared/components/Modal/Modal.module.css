@@ -15,8 +15,9 @@
   background-color: var(--bg-primary);
   border-radius: var(--radius-lg);
   padding: var(--space-8);
-  max-height: 85vh;
-  overflow-y: auto;
+  max-height: 90vh;
+  overflow-y: visible;
+  overflow-x: visible;
   animation: scaleIn var(--duration-slow) var(--ease-out);
 }
 

@@ -1,7 +1,7 @@
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button, Input } from '@shared/components';
+import { Button, Input, Select } from '@shared/components';
 import { useCategories } from '@/hooks/useCategories';
 import { adminService } from '@/services/admin.service';
 import { toast } from 'sonner';
@@ -30,7 +30,7 @@ export function GeneralTab({ product }: { product: Product }) {
 
   const categoryId = typeof product.category === 'object' ? product.category._id : product.category;
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, control, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: product.name,
@@ -76,33 +76,18 @@ export function GeneralTab({ product }: { product: Product }) {
         {errors.description && <p className={styles.error}>{errors.description.message}</p>}
       </div>
       <div className={styles.grid}>
-        <div className={styles.fieldWrap}>
-          <label className={styles.label}>Category</label>
-          <select className={styles.select} {...register('category')}>
-            {categories?.map((c) => <option key={c._id} value={c._id}>{c.name}</option>)}
-          </select>
-        </div>
-        <div className={styles.fieldWrap}>
-          <label className={styles.label}>Gender</label>
-          <select className={styles.select} {...register('gender')}>
-            <option value="Men">Men</option>
-            <option value="Women">Women</option>
-            <option value="Unisex">Unisex</option>
-          </select>
-        </div>
+        <Controller name="category" control={control} render={({ field }) => (
+          <Select label="Category" options={categories?.map((c) => ({ label: c.name, value: c._id })) || []} value={field.value} onChange={field.onChange} />
+        )} />
+        <Controller name="gender" control={control} render={({ field }) => (
+          <Select label="Gender" options={[{ label: 'Men', value: 'Men' }, { label: 'Women', value: 'Women' }, { label: 'Unisex', value: 'Unisex' }]} value={field.value} onChange={field.onChange} />
+        )} />
       </div>
       <div className={styles.grid}>
         <Input label="Base Price (₹)" type="number" error={errors.basePrice?.message} {...register('basePrice')} />
-        <div className={styles.fieldWrap}>
-          <label className={styles.label}>GST Rate</label>
-          <select className={styles.select} {...register('gstRate')}>
-            <option value="0">0%</option>
-            <option value="5">5%</option>
-            <option value="12">12%</option>
-            <option value="18">18%</option>
-            <option value="28">28%</option>
-          </select>
-        </div>
+        <Controller name="gstRate" control={control} render={({ field }) => (
+          <Select label="GST Rate" options={[{ label: '0%', value: '0' }, { label: '5%', value: '5' }, { label: '12%', value: '12' }, { label: '18%', value: '18' }, { label: '28%', value: '28' }]} value={String(field.value)} onChange={(v) => field.onChange(Number(v))} />
+        )} />
       </div>
       <div className={styles.actions}>
         <Button type="submit" loading={saving}>Save Changes</Button>

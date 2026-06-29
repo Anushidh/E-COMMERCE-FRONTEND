@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Plus, Trash2 } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useProductOffers, useCategoryOffers, useCreateProductOffer, useCreateCategoryOffer, useDeleteProductOffer, useDeleteCategoryOffer } from '@/hooks/useAdmin';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
-import { Badge, TableSkeleton, Button, Input, Modal, ConfirmDialog } from '@shared/components';
+import { Badge, TableSkeleton, Button, Input, Modal, ConfirmDialog, DatePicker, Select } from '@shared/components';
 import { getOfferStatusBadgeVariant } from '@/shared/utils/badge';
 import styles from './Offers.module.css';
 
@@ -44,9 +44,9 @@ export default function Offers() {
 
   // Check if any field has a value for create forms
   const poValues = poForm.watch();
-  const isPODirty = !!(poValues.product || poValues.discountValue || poValues.startDate || poValues.endDate);
+  const isPODirty = !!(poValues.product || poValues.discountValue || poValues.startDate || poValues.endDate) || poValues.discountType !== 'percentage';
   const coValues = coForm.watch();
-  const isCODirty = !!(coValues.category || coValues.discountValue || coValues.startDate || coValues.endDate);
+  const isCODirty = !!(coValues.category || coValues.discountValue || coValues.startDate || coValues.endDate) || coValues.discountType !== 'percentage';
 
   const onCreatePO = (data: ProductOfferForm) => {
     createPO(data, { onSuccess: () => { poForm.reset(); setShowPO(false); } });
@@ -128,27 +128,22 @@ export default function Offers() {
         if (isPODirty) { setConfirmClose('po'); } else { setShowPO(false); poForm.reset(); }
       }} title="Create Product Offer" size="md">
         <form onSubmit={poForm.handleSubmit(onCreatePO)} className={styles.form}>
-          <div className={styles.fieldWrap}>
-            <label className={styles.label}>Product</label>
-            <select className={styles.select} {...poForm.register('product')}>
-              <option value="">Select product</option>
-              {productsData?.products.map((p) => <option key={p._id} value={p._id}>{p.name}</option>)}
-            </select>
-            {poForm.formState.errors.product && <p className={styles.error}>{poForm.formState.errors.product.message}</p>}
-          </div>
+          <Controller name="product" control={poForm.control} render={({ field }) => (
+            <Select label="Product" placeholder="Select product" options={productsData?.products.map((p) => ({ label: p.name, value: p._id })) || []} value={field.value} onChange={field.onChange} error={poForm.formState.errors.product?.message} />
+          )} />
           <div className={styles.row}>
-            <div className={styles.fieldWrap}>
-              <label className={styles.label}>Type</label>
-              <select className={styles.select} {...poForm.register('discountType')}>
-                <option value="percentage">Percentage</option>
-                <option value="flat">Flat</option>
-              </select>
-            </div>
+            <Controller name="discountType" control={poForm.control} render={({ field }) => (
+              <Select label="Type" options={[{ label: 'Percentage', value: 'percentage' }, { label: 'Flat', value: 'flat' }]} value={field.value} onChange={field.onChange} />
+            )} />
             <Input label="Value" type="number" error={poForm.formState.errors.discountValue?.message} {...poForm.register('discountValue')} />
           </div>
           <div className={styles.row}>
-            <Input label="Start Date" type="date" error={poForm.formState.errors.startDate?.message} {...poForm.register('startDate')} />
-            <Input label="End Date" type="date" error={poForm.formState.errors.endDate?.message} {...poForm.register('endDate')} />
+            <Controller name="startDate" control={poForm.control} render={({ field }) => (
+              <DatePicker label="Start Date" value={field.value} onChange={field.onChange} error={poForm.formState.errors.startDate?.message} />
+            )} />
+            <Controller name="endDate" control={poForm.control} render={({ field }) => (
+              <DatePicker label="End Date" value={field.value} onChange={field.onChange} error={poForm.formState.errors.endDate?.message} />
+            )} />
           </div>
           <Button type="submit" fullWidth loading={creatingPO}>Create Offer</Button>
         </form>
@@ -159,27 +154,22 @@ export default function Offers() {
         if (isCODirty) { setConfirmClose('co'); } else { setShowCO(false); coForm.reset(); }
       }} title="Create Category Offer" size="md">
         <form onSubmit={coForm.handleSubmit(onCreateCO)} className={styles.form}>
-          <div className={styles.fieldWrap}>
-            <label className={styles.label}>Category</label>
-            <select className={styles.select} {...coForm.register('category')}>
-              <option value="">Select category</option>
-              {categories?.map((c) => <option key={c._id} value={c._id}>{c.name}</option>)}
-            </select>
-            {coForm.formState.errors.category && <p className={styles.error}>{coForm.formState.errors.category.message}</p>}
-          </div>
+          <Controller name="category" control={coForm.control} render={({ field }) => (
+            <Select label="Category" placeholder="Select category" options={categories?.map((c) => ({ label: c.name, value: c._id })) || []} value={field.value} onChange={field.onChange} error={coForm.formState.errors.category?.message} />
+          )} />
           <div className={styles.row}>
-            <div className={styles.fieldWrap}>
-              <label className={styles.label}>Type</label>
-              <select className={styles.select} {...coForm.register('discountType')}>
-                <option value="percentage">Percentage</option>
-                <option value="flat">Flat</option>
-              </select>
-            </div>
+            <Controller name="discountType" control={coForm.control} render={({ field }) => (
+              <Select label="Type" options={[{ label: 'Percentage', value: 'percentage' }, { label: 'Flat', value: 'flat' }]} value={field.value} onChange={field.onChange} />
+            )} />
             <Input label="Value" type="number" error={coForm.formState.errors.discountValue?.message} {...coForm.register('discountValue')} />
           </div>
           <div className={styles.row}>
-            <Input label="Start Date" type="date" error={coForm.formState.errors.startDate?.message} {...coForm.register('startDate')} />
-            <Input label="End Date" type="date" error={coForm.formState.errors.endDate?.message} {...coForm.register('endDate')} />
+            <Controller name="startDate" control={coForm.control} render={({ field }) => (
+              <DatePicker label="Start Date" value={field.value} onChange={field.onChange} error={coForm.formState.errors.startDate?.message} />
+            )} />
+            <Controller name="endDate" control={coForm.control} render={({ field }) => (
+              <DatePicker label="End Date" value={field.value} onChange={field.onChange} error={coForm.formState.errors.endDate?.message} />
+            )} />
           </div>
           <Button type="submit" fullWidth loading={creatingCO}>Create Offer</Button>
         </form>

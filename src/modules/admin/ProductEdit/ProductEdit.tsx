@@ -28,7 +28,6 @@ export default function ProductEdit() {
       <div className={styles.page}>
         <div className={styles.header}>
           <BackButton to="/admin/products" label="Products" />
-          <h1 className={styles.title}>{product.name}</h1>
         </div>
 
         <Tabs.Root defaultValue="general" className={styles.tabs}>
