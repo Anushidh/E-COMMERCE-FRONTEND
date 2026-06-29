@@ -2,9 +2,9 @@ import { useSearchParams } from 'react-router';
 import { Helmet } from 'react-helmet-async';
 import { SlidersHorizontal } from 'lucide-react';
 import { useState } from 'react';
-import { ProductCard, ProductCardSkeleton, Button } from '@shared/components';
+import { ProductCard, ProductCardSkeleton, Button, Select } from '@shared/components';
 import { useProducts } from '@/hooks/useProducts';
-import { useAddToWishlist } from '@/hooks/useWishlist';
+import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from '@/hooks/useWishlist';
 import { useAuthStore } from '@shared/stores/authStore';
 import { ShopFilters } from '../components/ShopFilters/ShopFilters';
 import type { ProductFilters } from '@shared/types/product';
@@ -31,7 +31,11 @@ export default function Shop() {
 
   const { data, isLoading } = useProducts(filters);
   const { mutate: addToWishlist } = useAddToWishlist();
+  const { mutate: removeFromWishlist } = useRemoveFromWishlist();
+  const { data: wishlistData } = useWishlist();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  const wishlistIds = new Set(wishlistData?.products?.map((item: any) => item._id) || []);
 
   const updateFilter = (key: string, value: string | undefined) => {
     const newParams = new URLSearchParams(searchParams);
@@ -62,19 +66,21 @@ export default function Shop() {
         <div className={styles.header}>
           <h1 className={styles.title}>Shop</h1>
           <div className={styles.headerActions}>
-            <select
-              className={styles.sortSelect}
-              value={filters.sort || ''}
-              onChange={(e) => updateFilter('sort', e.target.value || undefined)}
-              aria-label="Sort products"
-            >
-              <option value="">Sort by</option>
-              <option value="newest">Newest</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-              <option value="popularity">Popularity</option>
-              <option value="rating">Rating</option>
-            </select>
+            <div className={styles.sortWrapper}>
+              <Select
+                options={[
+                  { label: 'Newest', value: 'newest' },
+                  { label: 'Price: Low to High', value: 'price_asc' },
+                  { label: 'Price: High to Low', value: 'price_desc' },
+                  { label: 'Popularity', value: 'popularity' },
+                  { label: 'Rating', value: 'rating' },
+                ]}
+                value={filters.sort || ''}
+                onChange={(v) => updateFilter('sort', v || undefined)}
+                placeholder="Sort by"
+                fullWidth={false}
+              />
+            </div>
             <Button
               variant="secondary"
               size="sm"
@@ -108,7 +114,14 @@ export default function Shop() {
                   name={product.name}
                   price={product.basePrice}
                   image={product.images[0] || '/placeholder.svg'}
-                  onWishlistToggle={isAuthenticated ? () => addToWishlist(product._id) : undefined}
+                  isWishlisted={wishlistIds.has(product._id)}
+                  onWishlistToggle={isAuthenticated ? () => {
+                    if (wishlistIds.has(product._id)) {
+                      removeFromWishlist(product._id);
+                    } else {
+                      addToWishlist(product._id);
+                    }
+                  } : undefined}
                 />
               ))}
         </div>

@@ -3,14 +3,17 @@ import { Link, NavLink } from 'react-router';
 import { ShoppingBag, Heart, User, Menu, X, Search } from 'lucide-react';
 import { useAuthStore } from '@shared/stores/authStore';
 import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
 import styles from './Navbar.module.css';
 
 export function Navbar() {
   const { isAuthenticated } = useAuthStore();
   const { data: cart } = useCart();
+  const { data: wishlistData } = useWishlist();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const cartCount = cart?.items.length || 0;
+  const wishlistCount = wishlistData?.products?.length || 0;
 
   return (
     <header className={styles.header}>
@@ -40,6 +43,7 @@ export function Navbar() {
           {isAuthenticated && (
             <Link to="/wishlist" className={styles.iconBtn} aria-label="Wishlist">
               <Heart size={18} />
+              {wishlistCount > 0 && <span className={styles.cartBadge}>{wishlistCount}</span>}
             </Link>
           )}
           <Link to="/cart" className={styles.iconBtn} aria-label="Cart">

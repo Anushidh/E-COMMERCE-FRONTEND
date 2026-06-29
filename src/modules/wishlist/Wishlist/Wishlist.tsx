@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
-import { Heart, ShoppingBag, Trash2 } from 'lucide-react';
+import { Heart, ShoppingBag, Share2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useWishlist, useRemoveFromWishlist } from '@/hooks/useWishlist';
 import { Button, Badge, Spinner } from '@shared/components';
 import { Link } from 'react-router';
@@ -11,11 +12,35 @@ export default function Wishlist() {
 
   const products = data?.products || [];
 
+  const shareWishlist = () => {
+    const names = products.slice(0, 5).map((p) => p.name).join(', ');
+    const message = `Check out my wishlist on STORE: ${names}${products.length > 5 ? ` and ${products.length - 5} more` : ''}!\n\n${window.location.origin}/shop`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
   return (
     <>
       <Helmet><title>Wishlist — STORE</title></Helmet>
       <div className={styles.page}>
-        <h1 className={styles.title}>Wishlist</h1>
+        {/* Header */}
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
+            <h1 className={styles.title}>Wishlist <Heart size={20} /></h1>
+            {products.length > 0 && <span className={styles.itemCount}>{products.length} item{products.length !== 1 ? 's' : ''}</span>}
+          </div>
+          {products.length > 0 && (
+            <div className={styles.headerActions}>
+              <Button size="sm" variant="secondary" leftIcon={<Share2 size={14} />} onClick={shareWishlist}>
+                Share Wishlist
+              </Button>
+              <Button size="sm" leftIcon={<ShoppingBag size={14} />} onClick={() => {
+                toast.success('Visit each product to select size & color before adding to bag');
+              }}>
+                Move All to Bag
+              </Button>
+            </div>
+          )}
+        </div>
 
         {isLoading ? <Spinner size="lg" /> : products.length === 0 ? (
           <div className={styles.empty}>
@@ -38,12 +63,12 @@ export default function Wishlist() {
                 <div className={styles.actions}>
                   <Link to={`/shop/${product._id}`}>
                     <Button size="sm" variant="secondary" leftIcon={<ShoppingBag size={13} />} disabled={!product.inStock}>
-                      {product.inStock ? 'View & Add' : 'Unavailable'}
+                      {product.inStock ? 'Select Variant' : 'Unavailable'}
                     </Button>
                   </Link>
-                  <button className={styles.removeBtn} onClick={() => remove(product._id)} aria-label="Remove from wishlist">
-                    <Trash2 size={14} />
-                  </button>
+                  <Button size="sm" variant="danger" onClick={() => remove(product._id)}>
+                    Delete
+                  </Button>
                 </div>
               </div>
             ))}

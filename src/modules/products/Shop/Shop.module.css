@@ -36,15 +36,8 @@
   gap: var(--space-3);
 }
 
-.sortSelect {
-  height: 2rem;
-  padding: 0 var(--space-3);
-  font-size: var(--text-xs);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-sm);
-  background-color: var(--bg-primary);
-  cursor: pointer;
-  appearance: auto;
+.sortWrapper {
+  width: 180px;
 }
 
 .filterBtn {

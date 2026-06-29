@@ -61,6 +61,9 @@ export default function Checkout() {
     : useWalletBalance ? Math.min(walletBalance, subtotal - discount + shipping) : 0;
   const total = Math.max(subtotal - discount - walletDeduction + shipping, 0);
 
+  // If wallet covers the full amount via checkbox, auto-switch to wallet payment
+  const effectivePaymentMethod = (useWalletBalance && total === 0 && paymentMethod !== 'wallet') ? 'wallet' : paymentMethod;
+
   const handleApplyCoupon = () => {
     if (couponCode.trim()) {
       applyCoupon({ code: couponCode.trim(), orderTotal: subtotal });
@@ -71,7 +74,7 @@ export default function Checkout() {
     if (!selectedAddress) return;
     placeOrder({
       addressId: selectedAddress,
-      paymentMethod,
+      paymentMethod: effectivePaymentMethod,
       couponCode: couponResult?.data.data?.code || undefined,
       useWallet: useWalletBalance,
     }, {
@@ -154,27 +157,29 @@ export default function Checkout() {
               </section>
             )}
 
-            {/* Payment */}
-            <section className={styles.section}>
-              <h2 className={styles.sectionTitle}><CreditCard size={16} /> Payment Method</h2>
-              <div className={styles.paymentOptions}>
-                <label className={`${styles.paymentOption} ${paymentMethod === 'razorpay' ? styles.paymentActive : ''}`}>
-                  <input type="radio" name="payment" value="razorpay" checked={paymentMethod === 'razorpay'} onChange={() => setPaymentMethod('razorpay')} className="sr-only" />
-                  <span>Pay Online (UPI / Card / Netbanking)</span>
-                </label>
-                {wallet && wallet.balance > 0 && walletBalance >= (subtotal - discount + shipping) && (
-                  <label className={`${styles.paymentOption} ${paymentMethod === 'wallet' ? styles.paymentActive : ''}`}>
-                    <input type="radio" name="payment" value="wallet" checked={paymentMethod === 'wallet'} onChange={() => { setPaymentMethod('wallet'); setUseWalletBalance(false); }} className="sr-only" />
-                    <span>Pay with Wallet (₹{wallet.balance.toLocaleString('en-IN')} available)</span>
+            {/* Payment — hide when wallet checkbox covers full amount */}
+            {!(useWalletBalance && total === 0) && (
+              <section className={styles.section}>
+                <h2 className={styles.sectionTitle}><CreditCard size={16} /> Payment Method</h2>
+                <div className={styles.paymentOptions}>
+                  <label className={`${styles.paymentOption} ${paymentMethod === 'razorpay' ? styles.paymentActive : ''}`}>
+                    <input type="radio" name="payment" value="razorpay" checked={paymentMethod === 'razorpay'} onChange={() => setPaymentMethod('razorpay')} className="sr-only" />
+                    <span>Pay Online (UPI / Card / Netbanking)</span>
                   </label>
-                )}
-                <label className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentActive : ''}`}>
-                  <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="sr-only" />
-                  <span>Cash on Delivery</span>
-                  {total < 500 && paymentMethod === 'cod' && <span className={styles.codWarning}>Min ₹500 for COD</span>}
-                </label>
-              </div>
-            </section>
+                  {wallet && wallet.balance > 0 && walletBalance >= (subtotal - discount + shipping) && (
+                    <label className={`${styles.paymentOption} ${paymentMethod === 'wallet' ? styles.paymentActive : ''}`}>
+                      <input type="radio" name="payment" value="wallet" checked={paymentMethod === 'wallet'} onChange={() => { setPaymentMethod('wallet'); setUseWalletBalance(false); }} className="sr-only" />
+                      <span>Pay with Wallet (₹{wallet.balance.toLocaleString('en-IN')} available)</span>
+                    </label>
+                  )}
+                  <label className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentActive : ''}`}>
+                    <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="sr-only" />
+                    <span>Cash on Delivery</span>
+                    {total < 500 && paymentMethod === 'cod' && <span className={styles.codWarning}>Min ₹500 for COD</span>}
+                  </label>
+                </div>
+              </section>
+            )}
           </div>
 
           {/* Summary */}

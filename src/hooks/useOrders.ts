@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ordersService } from '@/services/orders.service';
 import type { PlaceOrderPayload } from '@shared/types/order';
@@ -12,6 +12,21 @@ export function useOrders(params: { page?: number }) {
     queryKey: ['orders', params],
     queryFn: () => ordersService.getOrders(params),
     select: (res) => res.data.data,
+  });
+}
+
+export function useInfiniteOrders() {
+  return useInfiniteQuery({
+    queryKey: ['orders', 'infinite'],
+    queryFn: ({ pageParam = 1 }) => ordersService.getOrders({ page: pageParam }),
+    getNextPageParam: (lastPage) => {
+      const data = lastPage.data.data as any;
+      if (data?.pagination?.page < data?.pagination?.totalPages) {
+        return data.pagination.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
   });
 }
 

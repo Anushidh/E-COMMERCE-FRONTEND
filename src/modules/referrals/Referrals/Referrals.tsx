@@ -1,8 +1,8 @@
 import { Helmet } from 'react-helmet-async';
-import { Copy, Gift } from 'lucide-react';
+import { Copy, Gift, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useReferrals } from '@/hooks/useUser';
-import { Badge, Spinner } from '@shared/components';
+import { Badge, Spinner, Button } from '@shared/components';
 import styles from './Referrals.module.css';
 
 export default function Referrals() {
@@ -29,6 +29,18 @@ export default function Referrals() {
               <button className={styles.copyBtn} onClick={copyCode} aria-label="Copy code"><Copy size={14} /></button>
             </div>
             <p className={styles.codeHint}>Share this code. When your friend signs up and completes their first order, you earn ₹100 in your wallet.</p>
+            <div className={styles.shareActions}>
+              <Button size="sm" variant="secondary" leftIcon={<Copy size={14} />} onClick={copyCode}>
+                Copy Code
+              </Button>
+              <Button size="sm" variant="secondary" leftIcon={<Share2 size={14} />} onClick={() => {
+                const signupUrl = `${window.location.origin}/signup?ref=${data.referralCode}`;
+                const message = `Hey! Use my referral code *${data.referralCode}* to sign up on STORE and get exciting offers!\n\n${signupUrl}`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+              }}>
+                Share on WhatsApp
+              </Button>
+            </div>
           </div>
         </div>
 

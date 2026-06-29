@@ -5,7 +5,7 @@ import { Heart, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { Button, Badge, Skeleton } from '@shared/components';
 import { useProductDetail } from '@/hooks/useProducts';
 import { useAddToCart } from '@/hooks/useCart';
-import { useAddToWishlist } from '@/hooks/useWishlist';
+import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from '@/hooks/useWishlist';
 import { productsService } from '@/services/products.service';
 import { useAuthStore } from '@shared/stores/authStore';
 import { ProductGallery } from '../components/ProductGallery/ProductGallery';
@@ -23,6 +23,8 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const { mutate: addToCart, isPending: addingToCart } = useAddToCart();
   const { mutate: addToWishlist } = useAddToWishlist();
+  const { mutate: removeFromWishlist } = useRemoveFromWishlist();
+  const { data: wishlistData } = useWishlist();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   // Track product view
@@ -142,9 +144,19 @@ export default function ProductDetail() {
               >
                 {!selectedVariant ? 'Select a variant' : !inStock ? 'Out of Stock' : 'Add to Bag'}
               </Button>
-              <Button variant="secondary" size="lg" leftIcon={<Heart size={18} />} onClick={() => addToWishlist(product._id)}>
-                Wishlist
-              </Button>
+              {(() => {
+                const isInWishlist = wishlistData?.products?.some((p: any) => p._id === product._id);
+                return (
+                  <Button
+                    variant={isInWishlist ? 'danger' : 'secondary'}
+                    size="lg"
+                    leftIcon={<Heart size={18} fill={isInWishlist ? 'currentColor' : 'none'} />}
+                    onClick={() => isInWishlist ? removeFromWishlist(product._id) : addToWishlist(product._id)}
+                  >
+                    {isInWishlist ? 'Wishlisted' : 'Wishlist'}
+                  </Button>
+                );
+              })()}
             </div>
 
             {/* Description */}

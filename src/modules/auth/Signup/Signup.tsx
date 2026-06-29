@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button, Input } from '@shared/components';
 import { useSignup, useVerifyOTP, useResendOTP } from '@/hooks/useAuth';
@@ -28,6 +28,8 @@ export default function Signup() {
   const [step, setStep] = useState<'form' | 'otp'>('form');
   const [email, setEmail] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [searchParams] = useSearchParams();
+  const referralFromUrl = searchParams.get('ref') || '';
 
   const { mutate: signup, isPending: signupPending } = useSignup();
   const { mutate: verifyOTP, isPending: verifyPending } = useVerifyOTP();
@@ -35,6 +37,7 @@ export default function Signup() {
 
   const signupForm = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
+    defaultValues: { referralCode: referralFromUrl },
   });
 
   const otpForm = useForm<OTPForm>({

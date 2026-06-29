@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router';
 import { Package } from 'lucide-react';
-import { useOrders } from '@/hooks/useOrders';
-import { Button, Badge, Skeleton } from '@shared/components';
+import { useInfiniteOrders } from '@/hooks/useOrders';
+import { Button, Badge, Skeleton, Spinner } from '@shared/components';
 import styles from './OrderList.module.css';
 
 const statusVariant = (s: string) => {
@@ -14,8 +14,24 @@ const statusVariant = (s: string) => {
 };
 
 export default function OrderList() {
-  const [page, setPage] = useState(1);
-  const { data, isLoading } = useOrders({ page });
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteOrders();
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  // Intersection observer for infinite scroll
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const entry = entries[0];
+    if (entry?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleObserver, { threshold: 0.1 });
+    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [handleObserver]);
+
+  const allOrders = data?.pages.flatMap((page) => (page.data.data as any)?.orders || []) || [];
 
   return (
     <>
@@ -33,38 +49,33 @@ export default function OrderList() {
               </div>
             ))}
           </div>
-        ) : data?.orders.length === 0 ? (
+        ) : allOrders.length === 0 ? (
           <div className={styles.empty}>
             <Package size={48} strokeWidth={1} />
             <p>No orders yet</p>
             <Link to="/shop"><Button>Start Shopping</Button></Link>
           </div>
         ) : (
-          <>
-            <div className={styles.list}>
-              {data?.orders.map((order) => (
-                <Link to={`/orders/${order._id}`} key={order._id} className={styles.card}>
-                  <div className={styles.cardHeader}>
-                    <span className={styles.orderId}>{order.orderId}</span>
-                    <Badge variant={statusVariant(order.orderStatus)}>{order.orderStatus}</Badge>
-                  </div>
-                  <div className={styles.cardBody}>
-                    <span className={styles.itemCount}>{order.items.length} item{order.items.length !== 1 ? 's' : ''}</span>
-                    <span className={styles.total}>₹{order.totalAmount.toLocaleString('en-IN')}</span>
-                  </div>
-                  <span className={styles.date}>{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                </Link>
-              ))}
-            </div>
+          <div className={styles.list}>
+            {allOrders.map((order) => (
+              <Link to={`/orders/${order._id}`} key={order._id} className={styles.card}>
+                <div className={styles.cardHeader}>
+                  <span className={styles.orderId}>{order.orderId}</span>
+                  <Badge variant={statusVariant(order.orderStatus)}>{order.orderStatus}</Badge>
+                </div>
+                <div className={styles.cardBody}>
+                  <span className={styles.itemCount}>{order.items.length} item{order.items.length !== 1 ? 's' : ''}</span>
+                  <span className={styles.total}>₹{order.totalAmount.toLocaleString('en-IN')}</span>
+                </div>
+                <span className={styles.date}>{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+              </Link>
+            ))}
 
-            {data && data.pagination.totalPages > 1 && (
-              <div className={styles.pagination}>
-                <Button variant="secondary" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>Previous</Button>
-                <span className={styles.pageInfo}>Page {page} of {data.pagination.totalPages}</span>
-                <Button variant="secondary" size="sm" disabled={page >= data.pagination.totalPages} onClick={() => setPage(page + 1)}>Next</Button>
-              </div>
-            )}
-          </>
+            {/* Infinite scroll trigger */}
+            <div ref={loadMoreRef} className={styles.loadMore}>
+              {isFetchingNextPage && <Spinner size="sm" />}
+            </div>
+          </div>
         )}
       </div>
     </>
