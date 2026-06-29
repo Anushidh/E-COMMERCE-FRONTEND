@@ -22,6 +22,7 @@ const OrderDetail = lazy(() => import('@modules/orders/OrderDetail/OrderDetail')
 const Wishlist = lazy(() => import('@modules/wishlist/Wishlist/Wishlist'));
 const Profile = lazy(() => import('@modules/profile/Profile/Profile'));
 const Addresses = lazy(() => import('@modules/profile/Addresses/Addresses'));
+const ProfileSettings = lazy(() => import('@modules/profile/Settings/Settings'));
 const WalletPage = lazy(() => import('@modules/wallet/WalletPage/WalletPage'));
 const Referrals = lazy(() => import('@modules/referrals/Referrals/Referrals'));
 
@@ -40,8 +41,10 @@ const ProductEdit = lazy(() => import('@modules/admin/ProductEdit/ProductEdit'))
 const AdminOrders = lazy(() => import('@modules/admin/Orders/Orders'));
 const AdminOrderDetail = lazy(() => import('@modules/admin/OrderDetail/OrderDetail'));
 const AdminUsers = lazy(() => import('@modules/admin/Users/Users'));
+const AdminUserDetail = lazy(() => import('@modules/admin/UserDetail/UserDetail'));
 const AdminCoupons = lazy(() => import('@modules/admin/Coupons/Coupons'));
-const AdminOffers = lazy(() => import('@modules/admin/Offers/Offers'));
+const AdminProductOffers = lazy(() => import('@modules/admin/Offers/ProductOffers'));
+const AdminCategoryOffers = lazy(() => import('@modules/admin/Offers/CategoryOffers'));
 const AdminCategories = lazy(() => import('@modules/admin/Categories/Categories'));
 const AdminInventory = lazy(() => import('@modules/admin/Inventory/Inventory'));
 const AdminReviews = lazy(() => import('@modules/admin/Reviews/Reviews'));
@@ -76,6 +79,7 @@ export function AppRouter() {
           <Route path="wishlist" element={<AuthGuard><Wishlist /></AuthGuard>} />
           <Route path="profile" element={<AuthGuard><Profile /></AuthGuard>} />
           <Route path="profile/addresses" element={<AuthGuard><Addresses /></AuthGuard>} />
+          <Route path="profile/settings" element={<AuthGuard><ProfileSettings /></AuthGuard>} />
           <Route path="wallet" element={<AuthGuard><WalletPage /></AuthGuard>} />
           <Route path="referrals" element={<AuthGuard><Referrals /></AuthGuard>} />
 
@@ -105,8 +109,10 @@ export function AppRouter() {
           <Route path="orders" element={<AdminOrders />} />
           <Route path="orders/:id" element={<AdminOrderDetail />} />
           <Route path="users" element={<AdminUsers />} />
+          <Route path="users/:id" element={<AdminUserDetail />} />
           <Route path="coupons" element={<AdminCoupons />} />
-          <Route path="offers" element={<AdminOffers />} />
+          <Route path="offers/products" element={<AdminProductOffers />} />
+          <Route path="offers/categories" element={<AdminCategoryOffers />} />
           <Route path="categories" element={<AdminCategories />} />
           <Route path="inventory" element={<AdminInventory />} />
           <Route path="reviews" element={<AdminReviews />} />

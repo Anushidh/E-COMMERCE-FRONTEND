@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Plus, Trash2, Minus } from 'lucide-react';
+import { Plus, Trash2, Minus, X } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Button, Input, Badge, ConfirmDialog } from '@shared/components';
@@ -82,9 +82,15 @@ export function VariantsTab({ productId, variants }: VariantsTabProps) {
     <div className={styles.form}>
       <div className={styles.variantHeader}>
         <span className={styles.variantCount}>{variants.length} variant{variants.length !== 1 ? 's' : ''}</span>
-        <Button size="sm" variant="secondary" leftIcon={<Plus size={14} />} onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancel' : 'Add Variant'}
-        </Button>
+        {showForm ? (
+          <Button size="sm" variant="danger" leftIcon={<X size={14} />} onClick={() => setShowForm(false)}>
+            Cancel
+          </Button>
+        ) : (
+          <Button size="sm" variant="secondary" leftIcon={<Plus size={14} />} onClick={() => setShowForm(true)}>
+            Add Variant
+          </Button>
+        )}
       </div>
 
       {showForm && (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router';
 import { useAdminUsers, useBlockUser, useUnblockUser } from '@/hooks/useAdmin';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Button, Badge, TableSkeleton, Input } from '@shared/components';
@@ -38,7 +39,7 @@ export default function Users() {
             </div>
             {data?.users.map((user) => (
               <div key={user._id} className={styles.tableRow}>
-                <span className={styles.name}>{user.name}</span>
+                <Link to={`/admin/users/${user._id}`} className={styles.name}>{user.name}</Link>
                 <span className={styles.email}>{user.email}</span>
                 <span className={styles.phone}>{user.phone || '—'}</span>
                 <Badge variant={user.isVerified ? 'success' : 'default'}>{user.isVerified ? 'Yes' : 'No'}</Badge>

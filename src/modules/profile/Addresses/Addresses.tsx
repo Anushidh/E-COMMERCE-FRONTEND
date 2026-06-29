@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useProfile, useAddAddress, useDeleteAddress, useSetDefaultAddress } from '@/hooks/useUser';
-import { Button, Spinner, Input, Modal, Badge } from '@shared/components';
+import { Button, Spinner, Input, Modal, Badge, ConfirmDialog } from '@shared/components';
 import styles from './Addresses.module.css';
 
 const addressSchema = z.object({
@@ -25,6 +25,7 @@ type AddressForm = z.infer<typeof addressSchema>;
 
 export default function Addresses() {
   const [showAdd, setShowAdd] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const { data: profile, isLoading } = useProfile();
   const { mutate: addAddress, isPending: adding } = useAddAddress();
   const { mutate: deleteAddress } = useDeleteAddress();
@@ -32,7 +33,7 @@ export default function Addresses() {
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<AddressForm>({
     resolver: zodResolver(addressSchema),
-    defaultValues: { country: 'India', isDefault: false },
+    defaultValues: { country: 'India', isDefault: false, fullName: profile?.name || '', phone: profile?.phone || '' },
   });
 
   const onAdd = (data: AddressForm) => {
@@ -71,7 +72,7 @@ export default function Addresses() {
                       <Star size={12} /> Set Default
                     </button>
                   )}
-                  <button className={styles.deleteBtn} onClick={() => deleteAddress(addr._id)}>
+                  <button className={styles.deleteBtn} onClick={() => setDeleteTarget(addr._id)}>
                     <Trash2 size={12} /> Remove
                   </button>
                 </div>
@@ -101,6 +102,17 @@ export default function Addresses() {
           <Button type="submit" fullWidth loading={adding}>Save Address</Button>
         </form>
       </Modal>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Remove address?"
+        description="Are you sure you want to remove this address?"
+        confirmLabel="Remove"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={() => { if (deleteTarget) deleteAddress(deleteTarget); setDeleteTarget(null); }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   );
 }

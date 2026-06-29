@@ -1,7 +1,7 @@
 import { useParams } from 'react-router';
 import { Helmet } from 'react-helmet-async';
 import * as Tabs from '@radix-ui/react-tabs';
-import { Spinner, BackButton } from '@shared/components';
+import { Skeleton, BackButton } from '@shared/components';
 import { useProductDetail } from '@/hooks/useProducts';
 import { GeneralTab } from './tabs/GeneralTab';
 import { ImagesTab } from './tabs/ImagesTab';
@@ -13,7 +13,31 @@ export default function ProductEdit() {
   const { data, isLoading } = useProductDetail(id || '');
 
   if (isLoading) {
-    return <div className={styles.loader}><Spinner size="lg" /></div>;
+    return (
+      <div className={styles.page}>
+        <Skeleton width="100px" height="1rem" />
+        <div style={{ display: 'flex', gap: 'var(--space-4)', borderBottom: '1px solid var(--border-secondary)', paddingBottom: 'var(--space-3)' }}>
+          <Skeleton width="70px" height="1rem" />
+          <Skeleton width="80px" height="1rem" />
+          <Skeleton width="90px" height="1rem" />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+            <Skeleton width="100%" height="2.5rem" />
+            <Skeleton width="100%" height="2.5rem" />
+          </div>
+          <Skeleton width="100%" height="6rem" />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+            <Skeleton width="100%" height="2.5rem" />
+            <Skeleton width="100%" height="2.5rem" />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+            <Skeleton width="100%" height="2.5rem" />
+            <Skeleton width="100%" height="2.5rem" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!data) {

@@ -5,9 +5,10 @@
 .filterWrapper { width: 180px; }
 .table { background: var(--bg-primary); border: 1px solid var(--border-secondary); border-radius: var(--radius-md); overflow-x: auto; }
 .tableHeader { display: grid; grid-template-columns: 130px 1fr 100px 120px 200px; gap: var(--space-3); padding: var(--space-3) var(--space-4); font-size: var(--text-xs); font-weight: var(--weight-semibold); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: var(--tracking-wider); border-bottom: 1px solid var(--border-secondary); }
+.tableHeader span:last-child { text-align: center; }
 .tableRow { display: grid; grid-template-columns: 130px 1fr 100px 120px 200px; gap: var(--space-3); padding: var(--space-3) var(--space-4); font-size: var(--text-sm); align-items: center; border-bottom: 1px solid var(--border-secondary); }
 .tableRow:last-child { border-bottom: none; }
 .orderId { font-weight: var(--weight-medium); font-size: var(--text-xs); font-family: var(--font-mono); }
-.actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.actions { display: flex; gap: var(--space-2); flex-wrap: nowrap; }
 .pagination { display: flex; align-items: center; justify-content: center; gap: var(--space-4); }
 .pageInfo { font-size: var(--text-sm); color: var(--text-secondary); }

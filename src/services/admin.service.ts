@@ -147,7 +147,7 @@ export const adminService = {
 
   // Coupons
   getCoupons: () =>
-    apiClient.get<ApiResponse<Coupon[]>>('/coupons'),
+    apiClient.get<ApiResponse<{ coupons: Coupon[]; pagination: { total: number; page: number; limit: number; totalPages: number } }>>('/coupons'),
   createCoupon: (data: CreateCouponPayload) =>
     apiClient.post<ApiResponse<Coupon>>('/coupons', data),
   updateCoupon: (id: string, data: Partial<CreateCouponPayload>) =>

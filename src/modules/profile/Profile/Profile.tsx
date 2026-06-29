@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router';
-import { User, MapPin, Lock, Gift, Wallet } from 'lucide-react';
+import { User, MapPin, Lock, Gift, Wallet, Settings } from 'lucide-react';
 import { useProfile } from '@/hooks/useUser';
 import { useLogout } from '@/hooks/useAuth';
 import { Button, Skeleton } from '@shared/components';
@@ -50,6 +50,7 @@ export default function Profile() {
           <Link to="/wallet" className={styles.navItem}><Wallet size={16} /> Wallet</Link>
           <Link to="/referrals" className={styles.navItem}><Gift size={16} /> Referrals</Link>
           <Link to="/wishlist" className={styles.navItem}><Lock size={16} /> Wishlist</Link>
+          <Link to="/profile/settings" className={styles.navItem}><Settings size={16} /> Account Settings</Link>
         </nav>
 
         <div className={styles.actions}>

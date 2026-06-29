@@ -20,7 +20,7 @@ export default function Checkout() {
   const { mutate: placeOrder, isPending: placing } = usePlaceOrder();
 
   const [selectedAddress, setSelectedAddress] = useState<string>('');
-  const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'cod'>('razorpay');
+  const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'cod' | 'wallet'>('razorpay');
   const [couponCode, setCouponCode] = useState('');
   const [useWalletBalance, setUseWalletBalance] = useState(false);
 
@@ -54,8 +54,11 @@ export default function Checkout() {
 
   const subtotal = cart.totalAmount;
   const discount = couponResult?.data.data?.discount || 0;
-  const walletDeduction = useWalletBalance ? Math.min(wallet?.balance || 0, subtotal - discount) : 0;
   const shipping = (subtotal - discount) >= 499 ? 0 : 40;
+  const walletBalance = wallet?.balance || 0;
+  const walletDeduction = paymentMethod === 'wallet'
+    ? subtotal - discount + shipping
+    : useWalletBalance ? Math.min(walletBalance, subtotal - discount + shipping) : 0;
   const total = Math.max(subtotal - discount - walletDeduction + shipping, 0);
 
   const handleApplyCoupon = () => {
@@ -127,7 +130,7 @@ export default function Checkout() {
                 <Button variant="secondary" size="sm" onClick={handleApplyCoupon}>Apply</Button>
               </div>
               {couponResult?.data.data && (
-                <p className={styles.couponSuccess}>-₹{couponResult.data.data.discount} applied!</p>
+                <p className={styles.couponSuccess}>-₹{couponResult.data.data.discount.toFixed(2)} applied!</p>
               )}
               {coupons && coupons.length > 0 && (
                 <div className={styles.couponList}>
@@ -140,8 +143,8 @@ export default function Checkout() {
               )}
             </section>
 
-            {/* Wallet */}
-            {wallet && wallet.balance > 0 && (
+            {/* Wallet (partial usage — only show when not paying fully with wallet) */}
+            {wallet && wallet.balance > 0 && paymentMethod !== 'wallet' && (
               <section className={styles.section}>
                 <h2 className={styles.sectionTitle}><Wallet size={16} /> Wallet</h2>
                 <label className={styles.walletToggle}>
@@ -159,6 +162,12 @@ export default function Checkout() {
                   <input type="radio" name="payment" value="razorpay" checked={paymentMethod === 'razorpay'} onChange={() => setPaymentMethod('razorpay')} className="sr-only" />
                   <span>Pay Online (UPI / Card / Netbanking)</span>
                 </label>
+                {wallet && wallet.balance > 0 && walletBalance >= (subtotal - discount + shipping) && (
+                  <label className={`${styles.paymentOption} ${paymentMethod === 'wallet' ? styles.paymentActive : ''}`}>
+                    <input type="radio" name="payment" value="wallet" checked={paymentMethod === 'wallet'} onChange={() => { setPaymentMethod('wallet'); setUseWalletBalance(false); }} className="sr-only" />
+                    <span>Pay with Wallet (₹{wallet.balance.toLocaleString('en-IN')} available)</span>
+                  </label>
+                )}
                 <label className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentActive : ''}`}>
                   <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="sr-only" />
                   <span>Cash on Delivery</span>
@@ -181,15 +190,15 @@ export default function Checkout() {
             </div>
             <div className={styles.summaryRows}>
               <div className={styles.summaryRow}><span>Subtotal</span><span>₹{subtotal.toLocaleString('en-IN')}</span></div>
-              {discount > 0 && <div className={styles.summaryRow}><span>Coupon</span><span className={styles.green}>-₹{discount}</span></div>}
-              {walletDeduction > 0 && <div className={styles.summaryRow}><span>Wallet</span><span className={styles.green}>-₹{walletDeduction}</span></div>}
+              {discount > 0 && <div className={styles.summaryRow}><span>Coupon</span><span className={styles.green}>-₹{discount.toFixed(2)}</span></div>}
+              {walletDeduction > 0 && <div className={styles.summaryRow}><span>Wallet</span><span className={styles.green}>-₹{walletDeduction.toFixed(2)}</span></div>}
               <div className={styles.summaryRow}><span><Truck size={14} /> Delivery</span><span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span></div>
             </div>
             <div className={styles.summaryTotal}>
               <span>Total</span>
-              <span>₹{total.toLocaleString('en-IN')}</span>
+              <span>₹{total.toFixed(2)}</span>
             </div>
-            <Button size="lg" fullWidth loading={placing} disabled={!selectedAddress || (paymentMethod === 'cod' && total < 500)} onClick={handlePlaceOrder}>
+            <Button size="lg" fullWidth loading={placing} disabled={!selectedAddress || (paymentMethod === 'cod' && total < 500) || (paymentMethod === 'wallet' && walletBalance < (subtotal - discount + shipping))} onClick={handlePlaceOrder}>
               Place Order
             </Button>
           </aside>

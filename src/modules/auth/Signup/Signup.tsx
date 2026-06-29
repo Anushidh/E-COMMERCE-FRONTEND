@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router';
+import { Eye, EyeOff } from 'lucide-react';
 import { Button, Input } from '@shared/components';
 import { useSignup, useVerifyOTP, useResendOTP } from '@/hooks/useAuth';
 import styles from './Signup.module.css';
@@ -26,6 +27,7 @@ type OTPForm = z.infer<typeof otpSchema>;
 export default function Signup() {
   const [step, setStep] = useState<'form' | 'otp'>('form');
   const [email, setEmail] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const { mutate: signup, isPending: signupPending } = useSignup();
   const { mutate: verifyOTP, isPending: verifyPending } = useVerifyOTP();
@@ -88,10 +90,15 @@ export default function Signup() {
             />
             <Input
               label="Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               autoComplete="new-password"
               error={signupForm.formState.errors.password?.message}
+              rightIcon={
+                <button type="button" className={styles.eyeToggle} onClick={() => setShowPassword((p) => !p)} tabIndex={-1} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
               {...signupForm.register('password')}
             />
             <Input
@@ -110,12 +117,13 @@ export default function Signup() {
             </Button>
           </form>
         ) : (
-          <form onSubmit={otpForm.handleSubmit(onVerify)} className={styles.form}>
+          <form onSubmit={otpForm.handleSubmit(onVerify)} className={styles.form} autoComplete="off">
             <Input
               label="Verification code"
               placeholder="000000"
               maxLength={6}
               autoComplete="one-time-code"
+              id="otp-input"
               error={otpForm.formState.errors.otp?.message}
               {...otpForm.register('otp')}
             />

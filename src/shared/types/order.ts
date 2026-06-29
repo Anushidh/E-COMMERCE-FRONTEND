@@ -58,7 +58,7 @@ export interface Order {
 
 export interface PlaceOrderPayload {
   addressId: string;
-  paymentMethod: 'razorpay' | 'cod';
+  paymentMethod: 'razorpay' | 'cod' | 'wallet';
   couponCode?: string;
   useWallet?: boolean;
 }

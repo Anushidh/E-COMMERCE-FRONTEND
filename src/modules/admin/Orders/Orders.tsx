@@ -28,8 +28,9 @@ const NEXT_STATUS: Record<string, string[]> = {
 export default function Orders() {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('');
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const { data, isLoading } = useAdminOrders({ page, status: statusFilter || undefined });
-  const { mutate: updateStatus, isPending: updatingStatus } = useUpdateOrderStatus();
+  const { mutate: updateStatus } = useUpdateOrderStatus();
   const { mutate: handleReturn } = useHandleReturn();
 
   return (
@@ -68,8 +69,11 @@ export default function Orders() {
                 </Badge>
                 <div className={styles.actions}>
                   {NEXT_STATUS[order.orderStatus]?.map((s) => (
-                    <Button key={s} size="sm" variant="secondary" loading={updatingStatus}
-                      onClick={() => updateStatus({ id: order._id, status: s })}>
+                    <Button key={s} size="sm" variant="secondary" loading={updatingId === `${order._id}-${s}`}
+                      onClick={() => {
+                        setUpdatingId(`${order._id}-${s}`);
+                        updateStatus({ id: order._id, status: s }, { onSettled: () => setUpdatingId(null) });
+                      }}>
                       {s}
                     </Button>
                   ))}

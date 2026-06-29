@@ -26,7 +26,7 @@ export default function Coupons() {
   const [showCreate, setShowCreate] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; code: string } | null>(null);
-  const { data: coupons, isLoading } = useAdminCoupons();
+  const { data, isLoading } = useAdminCoupons();
   const { mutate: create, isPending: creating } = useCreateCoupon();
   const { mutate: deleteCoupon } = useDeleteCoupon();
 
@@ -60,7 +60,7 @@ export default function Coupons() {
             <div className={styles.tableHeader}>
               <span>Code</span><span>Type</span><span>Value</span><span>Used</span><span>Expiry</span><span>Status</span><span></span>
             </div>
-            {coupons?.map((c) => (
+            {data?.coupons?.map((c) => (
               <div key={c._id} className={styles.tableRow}>
                 <span className={styles.code}>{c.code}</span>
                 <span>{c.discountType}</span>

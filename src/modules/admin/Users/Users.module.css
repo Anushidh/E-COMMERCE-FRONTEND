@@ -6,7 +6,8 @@
 .tableHeader { display: grid; grid-template-columns: 1fr 1fr 130px 80px 80px 100px 100px; gap: var(--space-3); padding: var(--space-3) var(--space-4); font-size: var(--text-xs); font-weight: var(--weight-semibold); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: var(--tracking-wider); border-bottom: 1px solid var(--border-secondary); }
 .tableRow { display: grid; grid-template-columns: 1fr 1fr 130px 80px 80px 100px 100px; gap: var(--space-3); padding: var(--space-3) var(--space-4); font-size: var(--text-sm); align-items: center; border-bottom: 1px solid var(--border-secondary); }
 .tableRow:last-child { border-bottom: none; }
-.name { font-weight: var(--weight-medium); }
+.name { font-weight: var(--weight-medium); text-decoration: none; color: var(--text-primary); }
+.name:hover { text-decoration: underline; }
 .email { color: var(--text-secondary); font-size: var(--text-xs); }
 .phone { color: var(--text-secondary); font-size: var(--text-xs); }
 .pagination { display: flex; align-items: center; justify-content: center; gap: var(--space-4); }

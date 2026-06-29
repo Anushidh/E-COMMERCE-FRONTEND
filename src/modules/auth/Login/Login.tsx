@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router';
+import { Eye, EyeOff } from 'lucide-react';
 import { Button, Input } from '@shared/components';
 import { useLogin } from '@/hooks/useAuth';
 import styles from './Login.module.css';
@@ -15,6 +17,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
+  const [showPassword, setShowPassword] = useState(false);
   const { mutate: login, isPending } = useLogin();
 
   const {
@@ -51,10 +54,15 @@ export default function Login() {
           />
           <Input
             label="Password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             placeholder="••••••••"
             autoComplete="current-password"
             error={errors.password?.message}
+            rightIcon={
+              <button type="button" className={styles.eyeToggle} onClick={() => setShowPassword((p) => !p)} tabIndex={-1} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            }
             {...register('password')}
           />
 

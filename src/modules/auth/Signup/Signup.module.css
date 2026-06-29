@@ -51,3 +51,19 @@
 .link:hover {
   color: var(--text-secondary);
 }
+
+.eyeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  transition: var(--transition-colors);
+}
+
+.eyeToggle:hover {
+  color: var(--text-primary);
+}
