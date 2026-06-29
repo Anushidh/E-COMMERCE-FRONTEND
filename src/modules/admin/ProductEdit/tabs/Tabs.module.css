@@ -1,0 +1,36 @@
+.form { display: flex; flex-direction: column; gap: var(--space-5); }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+@media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+.fieldWrap { display: flex; flex-direction: column; gap: var(--space-2); }
+.label { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--text-primary); }
+.select { height: 2.5rem; padding: 0 var(--space-3); font-size: var(--text-base); border: 1px solid var(--border-primary); border-radius: var(--radius-sm); background: var(--bg-primary); width: 100%; }
+.textarea { width: 100%; padding: var(--space-3) var(--space-4); font-size: var(--text-base); border: 1px solid var(--border-primary); border-radius: var(--radius-sm); resize: vertical; min-height: 100px; font-family: inherit; }
+.textarea:focus { outline: none; border-color: var(--border-focus); }
+.error { font-size: var(--text-xs); color: var(--color-error); }
+.actions { display: flex; justify-content: flex-end; }
+.empty { padding: var(--space-6); text-align: center; color: var(--text-tertiary); font-size: var(--text-sm); }
+
+/* Images */
+.uploadArea { display: flex; }
+.uploadLabel { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-3) var(--space-5); border: 1px dashed var(--border-primary); border-radius: var(--radius-md); font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--text-secondary); cursor: pointer; transition: var(--transition-colors); }
+.uploadLabel:hover { border-color: var(--text-primary); color: var(--text-primary); }
+.imageGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--space-3); }
+.imageItem { position: relative; aspect-ratio: 3 / 4; border-radius: var(--radius-sm); overflow: hidden; background: var(--bg-secondary); }
+.imageThumb { width: 100%; height: 100%; object-fit: cover; }
+.imageRemoveBtn { position: absolute; top: var(--space-2); right: var(--space-2); }
+
+/* Variants */
+.variantHeader { display: flex; align-items: center; justify-content: space-between; }
+.variantCount { font-size: var(--text-sm); color: var(--text-secondary); }
+.variantForm { padding: var(--space-4); background: var(--bg-secondary); border-radius: var(--radius-md); display: flex; flex-direction: column; gap: var(--space-4); }
+.variantFormGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--space-3); }
+.variantTable { border: 1px solid var(--border-secondary); border-radius: var(--radius-md); overflow: hidden; }
+.variantTableHeader { display: grid; grid-template-columns: 70px 90px 70px 80px 1fr; padding: var(--space-2) var(--space-3); font-size: var(--text-xs); font-weight: var(--weight-semibold); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: var(--tracking-wider); background: var(--bg-secondary); }
+.variantRow { display: grid; grid-template-columns: 70px 90px 70px 80px 1fr; padding: var(--space-2) var(--space-3); font-size: var(--text-sm); align-items: center; border-top: 1px solid var(--border-secondary); }
+.variantCell { font-size: var(--text-sm); }
+.variantActions { display: flex; align-items: center; gap: var(--space-2); }
+.stockBtn { display: flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; border: 1px solid var(--border-primary); border-radius: var(--radius-sm); color: var(--text-secondary); transition: var(--transition-colors); }
+.stockBtn:hover:not(:disabled) { border-color: var(--text-primary); color: var(--text-primary); }
+.stockBtn:disabled { opacity: 0.3; cursor: not-allowed; }
+.deleteVariantBtn { display: flex; align-items: center; color: var(--text-tertiary); transition: var(--transition-colors); margin-left: var(--space-2); }
+.deleteVariantBtn:hover { color: var(--color-error); }

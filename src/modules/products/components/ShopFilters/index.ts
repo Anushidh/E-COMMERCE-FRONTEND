@@ -1,0 +1,1 @@
+export { ShopFilters } from './ShopFilters';

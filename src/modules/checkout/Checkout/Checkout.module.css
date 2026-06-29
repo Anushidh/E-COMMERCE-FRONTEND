@@ -1,0 +1,37 @@
+.page { max-width: var(--container-xl); margin-inline: auto; padding: var(--space-8) var(--gutter-mobile); }
+@media (min-width: 768px) { .page { padding: var(--space-12) var(--gutter-tablet); } }
+.title { font-size: var(--text-2xl); font-weight: var(--weight-light); letter-spacing: var(--tracking-tight); margin-bottom: var(--space-8); }
+.loader { display: flex; justify-content: center; align-items: center; min-height: 50vh; }
+.layout { display: grid; grid-template-columns: 1fr; gap: var(--space-8); }
+@media (min-width: 1024px) { .layout { grid-template-columns: 1fr 380px; gap: var(--space-12); } }
+.left { display: flex; flex-direction: column; gap: var(--space-6); }
+.section { padding: var(--space-6); border: 1px solid var(--border-secondary); border-radius: var(--radius-md); }
+.sectionTitle { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); font-weight: var(--weight-semibold); text-transform: uppercase; letter-spacing: var(--tracking-wider); margin-bottom: var(--space-4); }
+.noAddress { font-size: var(--text-sm); color: var(--text-secondary); }
+.noAddress a { text-decoration: underline; }
+.addressList { display: flex; flex-direction: column; gap: var(--space-3); }
+.addressCard { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-3) var(--space-4); border: 1px solid var(--border-primary); border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition-colors); }
+.addressCard:hover { border-color: var(--color-gray-400); }
+.addressActive { border-color: var(--text-primary); background-color: var(--bg-secondary); }
+.addressLabel { font-size: var(--text-xs); font-weight: var(--weight-semibold); text-transform: uppercase; letter-spacing: var(--tracking-wider); color: var(--text-secondary); }
+.addressText { font-size: var(--text-sm); color: var(--text-primary); }
+.couponRow { display: flex; gap: var(--space-2); align-items: flex-end; }
+.couponSuccess { font-size: var(--text-xs); color: var(--color-success); margin-top: var(--space-2); font-weight: var(--weight-medium); }
+.couponList { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+.couponChip { padding: var(--space-1) var(--space-3); font-size: var(--text-xs); border: 1px dashed var(--border-primary); border-radius: var(--radius-full); color: var(--text-secondary); cursor: pointer; transition: var(--transition-colors); }
+.couponChip:hover { border-color: var(--text-primary); color: var(--text-primary); }
+.walletToggle { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-sm); cursor: pointer; }
+.walletToggle input { width: 1rem; height: 1rem; }
+.paymentOptions { display: flex; flex-direction: column; gap: var(--space-3); }
+.paymentOption { padding: var(--space-3) var(--space-4); border: 1px solid var(--border-primary); border-radius: var(--radius-sm); font-size: var(--text-sm); cursor: pointer; transition: var(--transition-colors); }
+.paymentOption:hover { border-color: var(--color-gray-400); }
+.paymentActive { border-color: var(--text-primary); background-color: var(--bg-secondary); }
+.codWarning { display: block; font-size: var(--text-xs); color: var(--color-error); margin-top: var(--space-1); }
+.summary { position: sticky; top: 5rem; padding: var(--space-6); border: 1px solid var(--border-secondary); border-radius: var(--radius-md); background: var(--bg-secondary); height: fit-content; }
+.summaryTitle { font-size: var(--text-md); font-weight: var(--weight-medium); margin-bottom: var(--space-5); }
+.summaryItems { display: flex; flex-direction: column; gap: var(--space-2); padding-bottom: var(--space-4); border-bottom: 1px solid var(--border-primary); margin-bottom: var(--space-4); }
+.summaryItem { display: flex; justify-content: space-between; font-size: var(--text-xs); color: var(--text-secondary); }
+.summaryRows { display: flex; flex-direction: column; gap: var(--space-2); padding-bottom: var(--space-4); border-bottom: 1px solid var(--border-primary); margin-bottom: var(--space-4); }
+.summaryRow { display: flex; justify-content: space-between; font-size: var(--text-sm); color: var(--text-secondary); }
+.green { color: var(--color-success); }
+.summaryTotal { display: flex; justify-content: space-between; font-size: var(--text-md); font-weight: var(--weight-semibold); margin-bottom: var(--space-5); }

@@ -1,0 +1,20 @@
+.page { max-width: 600px; margin-inline: auto; padding: var(--space-8) var(--gutter-mobile); display: flex; flex-direction: column; gap: var(--space-8); }
+@media (min-width: 768px) { .page { padding: var(--space-12) var(--gutter-tablet); } }
+.loader { display: flex; justify-content: center; min-height: 50vh; align-items: center; }
+.codeCard { display: flex; align-items: flex-start; gap: var(--space-4); padding: var(--space-6); background: var(--bg-secondary); border-radius: var(--radius-md); }
+.codeLabel { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-widest); color: var(--text-tertiary); margin-bottom: var(--space-2); }
+.codeRow { display: flex; align-items: center; gap: var(--space-2); }
+.code { font-size: var(--text-xl); font-weight: var(--weight-bold); font-family: var(--font-mono); letter-spacing: var(--tracking-wider); }
+.copyBtn { display: flex; align-items: center; padding: var(--space-2); border-radius: var(--radius-sm); color: var(--text-secondary); transition: var(--transition-colors); }
+.copyBtn:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+.codeHint { font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-2); line-height: var(--leading-relaxed); }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); text-align: center; }
+.statItem { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-4); border: 1px solid var(--border-secondary); border-radius: var(--radius-md); }
+.statValue { font-size: var(--text-xl); font-weight: var(--weight-semibold); }
+.statLabel { font-size: var(--text-xs); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: var(--tracking-wider); }
+.sectionTitle { font-size: var(--text-sm); font-weight: var(--weight-semibold); text-transform: uppercase; letter-spacing: var(--tracking-widest); color: var(--text-secondary); margin-bottom: var(--space-3); }
+.list { display: flex; flex-direction: column; gap: var(--space-3); }
+.refItem { display: flex; align-items: center; justify-content: space-between; padding: var(--space-3) 0; border-bottom: 1px solid var(--border-secondary); }
+.refItem:last-child { border-bottom: none; }
+.refName { display: block; font-size: var(--text-sm); font-weight: var(--weight-medium); }
+.refEmail { font-size: var(--text-xs); color: var(--text-tertiary); }

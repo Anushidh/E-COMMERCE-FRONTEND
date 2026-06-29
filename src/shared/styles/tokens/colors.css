@@ -1,0 +1,61 @@
+/* ─── Primitive Color Tokens ─────────────────────────────────────────────── */
+:root {
+  /* Neutrals */
+  --color-white: #ffffff;
+  --color-black: #0a0a0a;
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #e5e5e5;
+  --color-gray-300: #d4d4d4;
+  --color-gray-400: #a3a3a3;
+  --color-gray-500: #737373;
+  --color-gray-600: #525252;
+  --color-gray-700: #404040;
+  --color-gray-800: #262626;
+  --color-gray-900: #171717;
+
+  /* Accent */
+  --color-accent: #0a0a0a;
+  --color-accent-hover: #262626;
+  --color-accent-light: #f5f5f5;
+
+  /* Status */
+  --color-success: #16a34a;
+  --color-success-light: #f0fdf4;
+  --color-warning: #ca8a04;
+  --color-warning-light: #fefce8;
+  --color-error: #dc2626;
+  --color-error-light: #fef2f2;
+  --color-info: #2563eb;
+  --color-info-light: #eff6ff;
+}
+
+/* ─── Semantic Color Tokens ──────────────────────────────────────────────── */
+:root {
+  /* Background */
+  --bg-primary: var(--color-white);
+  --bg-secondary: var(--color-gray-50);
+  --bg-tertiary: var(--color-gray-100);
+  --bg-inverse: var(--color-black);
+  --bg-overlay: rgba(10, 10, 10, 0.5);
+
+  /* Text */
+  --text-primary: var(--color-gray-900);
+  --text-secondary: var(--color-gray-600);
+  --text-tertiary: var(--color-gray-400);
+  --text-inverse: var(--color-white);
+  --text-accent: var(--color-accent);
+
+  /* Border */
+  --border-primary: var(--color-gray-200);
+  --border-secondary: var(--color-gray-100);
+  --border-focus: var(--color-black);
+
+  /* Action */
+  --action-primary: var(--color-black);
+  --action-primary-hover: var(--color-gray-800);
+  --action-secondary: var(--color-white);
+  --action-secondary-hover: var(--color-gray-50);
+  --action-disabled: var(--color-gray-200);
+  --action-disabled-text: var(--color-gray-400);
+}

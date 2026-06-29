@@ -1,0 +1,13 @@
+.page { display: flex; flex-direction: column; gap: var(--space-6); max-width: 900px; }
+.loader { display: flex; justify-content: center; padding: var(--space-16); }
+.notFound { padding: var(--space-16); text-align: center; color: var(--text-secondary); }
+.header { display: flex; flex-direction: column; gap: var(--space-2); }
+.back { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); color: var(--text-secondary); transition: var(--transition-colors); width: fit-content; }
+.back:hover { color: var(--text-primary); }
+.title { font-size: var(--text-lg); font-weight: var(--weight-medium); }
+.tabs { display: flex; flex-direction: column; gap: var(--space-6); }
+.tabList { display: flex; gap: var(--space-1); border-bottom: 1px solid var(--border-secondary); }
+.tabTrigger { padding: var(--space-3) var(--space-4); font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--text-secondary); border-bottom: 2px solid transparent; transition: var(--transition-colors); margin-bottom: -1px; }
+.tabTrigger[data-state='active'] { color: var(--text-primary); border-bottom-color: var(--text-primary); }
+.tabTrigger:hover { color: var(--text-primary); }
+.tabContent { outline: none; }

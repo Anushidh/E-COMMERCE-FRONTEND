@@ -1,0 +1,50 @@
+import { Helmet } from 'react-helmet-async';
+import { AlertTriangle } from 'lucide-react';
+import { useLowStock, useAdjustStock } from '@/hooks/useAdmin';
+import { Button, Badge, Spinner } from '@shared/components';
+import styles from './Inventory.module.css';
+
+export default function Inventory() {
+  const { data: variants, isLoading } = useLowStock();
+  const { mutate: adjust, isPending } = useAdjustStock();
+
+  return (
+    <>
+      <Helmet><title>Inventory — Admin</title></Helmet>
+      <div className={styles.page}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Low Stock Alerts</h1>
+          <Badge variant="warning"><AlertTriangle size={12} /> {variants?.length || 0} items</Badge>
+        </div>
+
+        {isLoading ? <Spinner size="lg" /> : (
+          <div className={styles.table}>
+            <div className={styles.tableHeader}>
+              <span>Product</span><span>Variant</span><span>Stock</span><span>Action</span>
+            </div>
+            {variants?.map((v) => (
+              <div key={v._id} className={styles.tableRow}>
+                <span className={styles.product}>{v.product.name}</span>
+                <span>{v.size} / {v.color}</span>
+                <Badge variant={v.stock === 0 ? 'error' : 'warning'}>{v.stock}</Badge>
+                <div className={styles.actions}>
+                  <Button size="sm" variant="secondary" loading={isPending}
+                    onClick={() => adjust({ variantId: v._id, adjustment: 10 })}>
+                    +10
+                  </Button>
+                  <Button size="sm" variant="secondary" loading={isPending}
+                    onClick={() => adjust({ variantId: v._id, adjustment: 50 })}>
+                    +50
+                  </Button>
+                </div>
+              </div>
+            ))}
+            {variants?.length === 0 && (
+              <div className={styles.empty}>All stock levels are healthy</div>
+            )}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
