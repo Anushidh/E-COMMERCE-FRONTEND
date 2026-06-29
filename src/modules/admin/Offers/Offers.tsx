@@ -7,7 +7,8 @@ import { z } from 'zod';
 import { useProductOffers, useCategoryOffers, useCreateProductOffer, useCreateCategoryOffer, useDeleteProductOffer, useDeleteCategoryOffer } from '@/hooks/useAdmin';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
-import { Badge, Spinner, Button, Input, Modal } from '@shared/components';
+import { Badge, TableSkeleton, Button, Input, Modal, ConfirmDialog } from '@shared/components';
+import { getOfferStatusBadgeVariant } from '@/shared/utils/badge';
 import styles from './Offers.module.css';
 
 const offerSchema = z.object({
@@ -26,6 +27,8 @@ type CategoryOfferForm = z.infer<typeof categoryOfferSchema>;
 export default function Offers() {
   const [showPO, setShowPO] = useState(false);
   const [showCO, setShowCO] = useState(false);
+  const [confirmClose, setConfirmClose] = useState<'po' | 'co' | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; type: 'po' | 'co'; name: string } | null>(null);
 
   const { data: productOffers, isLoading: loadingPO } = useProductOffers();
   const { data: categoryOffers, isLoading: loadingCO } = useCategoryOffers();
@@ -38,6 +41,12 @@ export default function Offers() {
 
   const poForm = useForm<ProductOfferForm>({ resolver: zodResolver(productOfferSchema), defaultValues: { discountType: 'percentage' } });
   const coForm = useForm<CategoryOfferForm>({ resolver: zodResolver(categoryOfferSchema), defaultValues: { discountType: 'percentage' } });
+
+  // Check if any field has a value for create forms
+  const poValues = poForm.watch();
+  const isPODirty = !!(poValues.product || poValues.discountValue || poValues.startDate || poValues.endDate);
+  const coValues = coForm.watch();
+  const isCODirty = !!(coValues.category || coValues.discountValue || coValues.startDate || coValues.endDate);
 
   const onCreatePO = (data: ProductOfferForm) => {
     createPO(data, { onSuccess: () => { poForm.reset(); setShowPO(false); } });
@@ -55,7 +64,7 @@ export default function Offers() {
       <div className={styles.page}>
         <h1 className={styles.title}>Offers</h1>
 
-        {isLoading ? <Spinner size="lg" /> : (
+        {isLoading ? <TableSkeleton columns={5} gridTemplate="1fr 100px 180px 80px 40px" /> : (
           <>
             {/* Product Offers */}
             <section className={styles.section}>
@@ -75,8 +84,8 @@ export default function Offers() {
                       <span className={styles.name}>{name}</span>
                       <span>{o.discountType === 'percentage' ? `${o.discountValue}%` : `₹${o.discountValue}`}</span>
                       <span className={styles.dates}>{new Date(o.startDate).toLocaleDateString('en-IN')} — {new Date(o.endDate).toLocaleDateString('en-IN')}</span>
-                      <Badge variant={active ? 'success' : 'error'}>{active ? 'Active' : 'Expired'}</Badge>
-                      <button className={styles.deleteBtn} onClick={() => deletePO(o._id)}><Trash2 size={14} /></button>
+                      <Badge variant={getOfferStatusBadgeVariant(active)}>{active ? 'Active' : 'Expired'}</Badge>
+                      <button className={styles.deleteBtn} onClick={() => setDeleteTarget({ id: o._id, type: 'po', name: typeof name === 'string' ? name : '' })}><Trash2 size={14} /></button>
                     </div>
                   );
                 })}
@@ -102,8 +111,8 @@ export default function Offers() {
                       <span className={styles.name}>{name}</span>
                       <span>{o.discountType === 'percentage' ? `${o.discountValue}%` : `₹${o.discountValue}`}</span>
                       <span className={styles.dates}>{new Date(o.startDate).toLocaleDateString('en-IN')} — {new Date(o.endDate).toLocaleDateString('en-IN')}</span>
-                      <Badge variant={active ? 'success' : 'error'}>{active ? 'Active' : 'Expired'}</Badge>
-                      <button className={styles.deleteBtn} onClick={() => deleteCO(o._id)}><Trash2 size={14} /></button>
+                      <Badge variant={getOfferStatusBadgeVariant(active)}>{active ? 'Active' : 'Expired'}</Badge>
+                      <button className={styles.deleteBtn} onClick={() => setDeleteTarget({ id: o._id, type: 'co', name: typeof name === 'string' ? name : '' })}><Trash2 size={14} /></button>
                     </div>
                   );
                 })}
@@ -115,7 +124,9 @@ export default function Offers() {
       </div>
 
       {/* Create Product Offer Modal */}
-      <Modal open={showPO} onClose={() => setShowPO(false)} title="Create Product Offer" size="md">
+      <Modal open={showPO} onClose={() => {
+        if (isPODirty) { setConfirmClose('po'); } else { setShowPO(false); poForm.reset(); }
+      }} title="Create Product Offer" size="md">
         <form onSubmit={poForm.handleSubmit(onCreatePO)} className={styles.form}>
           <div className={styles.fieldWrap}>
             <label className={styles.label}>Product</label>
@@ -144,7 +155,9 @@ export default function Offers() {
       </Modal>
 
       {/* Create Category Offer Modal */}
-      <Modal open={showCO} onClose={() => setShowCO(false)} title="Create Category Offer" size="md">
+      <Modal open={showCO} onClose={() => {
+        if (isCODirty) { setConfirmClose('co'); } else { setShowCO(false); coForm.reset(); }
+      }} title="Create Category Offer" size="md">
         <form onSubmit={coForm.handleSubmit(onCreateCO)} className={styles.form}>
           <div className={styles.fieldWrap}>
             <label className={styles.label}>Category</label>
@@ -171,6 +184,38 @@ export default function Offers() {
           <Button type="submit" fullWidth loading={creatingCO}>Create Offer</Button>
         </form>
       </Modal>
+
+      <ConfirmDialog
+        open={confirmClose === 'po'}
+        title="Discard changes?"
+        description="You have unsaved changes in the offer form. Are you sure you want to close?"
+        confirmLabel="Discard"
+        cancelLabel="Keep editing"
+        variant="warning"
+        onConfirm={() => { setConfirmClose(null); poForm.reset(); setShowPO(false); }}
+        onCancel={() => setConfirmClose(null)}
+      />
+      <ConfirmDialog
+        open={confirmClose === 'co'}
+        title="Discard changes?"
+        description="You have unsaved changes in the offer form. Are you sure you want to close?"
+        confirmLabel="Discard"
+        cancelLabel="Keep editing"
+        variant="warning"
+        onConfirm={() => { setConfirmClose(null); coForm.reset(); setShowCO(false); }}
+        onCancel={() => setConfirmClose(null)}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete offer?"
+        description={`This will permanently delete the ${deleteTarget?.type === 'po' ? 'product' : 'category'} offer${deleteTarget?.name ? ` for "${deleteTarget.name}"` : ''}. This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={() => { if (deleteTarget) { deleteTarget.type === 'po' ? deletePO(deleteTarget.id) : deleteCO(deleteTarget.id); } setDeleteTarget(null); }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   );
 }

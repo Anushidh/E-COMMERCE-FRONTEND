@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router';
 import { useAdminOrders, useUpdateOrderStatus, useHandleReturn } from '@/hooks/useAdmin';
-import { Button, Badge, Spinner } from '@shared/components';
+import { Button, Badge, TableSkeleton } from '@shared/components';
+import { getOrderStatusBadgeVariant } from '@/shared/utils/badge';
 import styles from './Orders.module.css';
 
 const STATUSES = ['', 'Placed', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Return Requested', 'Returned'];
@@ -37,7 +38,7 @@ export default function Orders() {
           </select>
         </div>
 
-        {isLoading ? <Spinner size="lg" /> : (
+        {isLoading ? <TableSkeleton columns={5} gridTemplate="140px 1fr 100px 130px 1fr" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
               <span>Order ID</span>
@@ -51,7 +52,7 @@ export default function Orders() {
                 <Link to={`/admin/orders/${order._id}`} className={styles.orderId}>{order.orderId}</Link>
                 <span>{order.user.name}</span>
                 <span>₹{order.totalAmount.toLocaleString('en-IN')}</span>
-                <Badge variant={order.orderStatus === 'Delivered' ? 'success' : order.orderStatus === 'Cancelled' ? 'error' : 'default'}>
+                <Badge variant={getOrderStatusBadgeVariant(order.orderStatus)}>
                   {order.orderStatus}
                 </Badge>
                 <div className={styles.actions}>

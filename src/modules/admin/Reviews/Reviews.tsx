@@ -4,7 +4,7 @@ import { Trash2, Star } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { apiClient } from '@shared/api/client';
-import { Button, Spinner } from '@shared/components';
+import { Button, ListSkeleton, ConfirmDialog } from '@shared/components';
 import { useProducts } from '@/hooks/useProducts';
 import styles from './Reviews.module.css';
 
@@ -30,6 +30,7 @@ function useDeleteReview() {
 export default function Reviews() {
   const [selectedProduct, setSelectedProduct] = useState('');
   const [page, setPage] = useState(1);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const { data: productsData } = useProducts({ limit: '100' });
   const { data: reviewsData, isLoading } = useProductReviews(selectedProduct, page);
   const { mutate: deleteReview } = useDeleteReview();
@@ -55,7 +56,7 @@ export default function Reviews() {
         {!selectedProduct ? (
           <div className={styles.empty}>Select a product to view its reviews</div>
         ) : isLoading ? (
-          <Spinner size="lg" />
+          <ListSkeleton items={4} />
         ) : (
           <>
             <div className={styles.list}>
@@ -72,7 +73,7 @@ export default function Reviews() {
                     </div>
                     <div className={styles.reviewMeta}>
                       <span className={styles.reviewDate}>{new Date(r.createdAt).toLocaleDateString('en-IN')}</span>
-                      <button className={styles.deleteBtn} onClick={() => deleteReview(r._id)} aria-label="Delete review">
+                      <button className={styles.deleteBtn} onClick={() => setDeleteTarget(r._id)} aria-label="Delete review">
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -95,6 +96,17 @@ export default function Reviews() {
           </>
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete review?"
+        description="This will permanently remove this review. This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={() => { if (deleteTarget) deleteReview(deleteTarget); setDeleteTarget(null); }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   );
 }

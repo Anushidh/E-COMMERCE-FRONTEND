@@ -1,10 +1,10 @@
-import { useParams, useNavigate } from 'react-router';
+import { useParams } from 'react-router';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@shared/api/client';
 import { useUpdateOrderStatus, useHandleReturn } from '@/hooks/useAdmin';
-import { Button, Badge, Spinner } from '@shared/components';
+import { Button, Badge, Spinner, BackButton } from '@shared/components';
+import { getOrderStatusBadgeVariant, getPaymentStatusBadgeVariant } from '@/shared/utils/badge';
 import type { Order } from '@shared/types/order';
 import type { ApiResponse } from '@shared/types/api';
 import styles from './OrderDetail.module.css';
@@ -18,7 +18,6 @@ const NEXT_STATUS: Record<string, string[]> = {
 
 export default function AdminOrderDetail() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { mutate: updateStatus, isPending: updating } = useUpdateOrderStatus();
   const { mutate: handleReturn } = useHandleReturn();
 
@@ -32,27 +31,18 @@ export default function AdminOrderDetail() {
   if (isLoading) return <div className={styles.loader}><Spinner size="lg" /></div>;
   if (!order) return <div className={styles.loader}>Order not found</div>;
 
-  const statusVariant = (s: string) => {
-    if (s === 'Delivered') return 'success' as const;
-    if (s === 'Cancelled' || s === 'Returned') return 'error' as const;
-    if (s === 'Return Requested') return 'warning' as const;
-    return 'default' as const;
-  };
-
   return (
     <>
       <Helmet><title>Order {order.orderId} — Admin</title></Helmet>
       <div className={styles.page}>
-        <button className={styles.back} onClick={() => navigate('/admin/orders')}>
-          <ArrowLeft size={16} /> Back to Orders
-        </button>
+        <BackButton to="/admin/orders" label="Back to Orders" />
 
         <div className={styles.header}>
           <div>
             <h1 className={styles.orderId}>{order.orderId}</h1>
             <p className={styles.date}>{new Date(order.createdAt).toLocaleString('en-IN')}</p>
           </div>
-          <Badge variant={statusVariant(order.orderStatus)}>{order.orderStatus}</Badge>
+          <Badge variant={getOrderStatusBadgeVariant(order.orderStatus)}>{order.orderStatus}</Badge>
         </div>
 
         {/* Actions */}
@@ -124,7 +114,7 @@ export default function AdminOrderDetail() {
               <span>Method</span><Badge variant="default">{order.paymentMethod.toUpperCase()}</Badge>
             </div>
             <div className={styles.pricingRow}>
-              <span>Payment Status</span><Badge variant={order.paymentStatus === 'Paid' ? 'success' : order.paymentStatus === 'Failed' ? 'error' : 'default'}>{order.paymentStatus}</Badge>
+              <span>Payment Status</span><Badge variant={getPaymentStatusBadgeVariant(order.paymentStatus)}>{order.paymentStatus}</Badge>
             </div>
           </div>
         </section>

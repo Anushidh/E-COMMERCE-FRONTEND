@@ -1,11 +1,12 @@
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Helmet } from 'react-helmet-async';
+import { Eye, EyeOff } from 'lucide-react';
 import { Button, Input } from '@shared/components';
 import { useAdminLogin } from '@/hooks/useAuth';
 import styles from './AdminLogin.module.css';
-import { useRef } from 'react';
 
 const adminLoginSchema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -15,6 +16,7 @@ const adminLoginSchema = z.object({
 type AdminLoginForm = z.infer<typeof adminLoginSchema>;
 
 export default function AdminLogin() {
+  const [showPassword, setShowPassword] = useState(false);
   const { mutate: login, isPending } = useAdminLogin();
 
   const {
@@ -82,10 +84,21 @@ export default function AdminLogin() {
             />
             <Input
               label="Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               autoComplete="current-password"
               error={errors.password?.message}
+              rightIcon={
+                <button
+                  type="button"
+                  className={styles.eyeToggle}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
               {...register('password')}
             />
             <Button type="submit" fullWidth loading={isPending} size="lg">

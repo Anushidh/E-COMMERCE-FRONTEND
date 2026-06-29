@@ -5,7 +5,8 @@ import { z } from 'zod';
 import { Plus, Trash2, Minus } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Button, Input, Badge } from '@shared/components';
+import { Button, Input, Badge, ConfirmDialog } from '@shared/components';
+import { getStockBadgeVariant } from '@/shared/utils/badge';
 import { adminService } from '@/services/admin.service';
 import type { Variant } from '@shared/types/product';
 import styles from './Tabs.module.css';
@@ -31,6 +32,7 @@ export function VariantsTab({ productId, variants }: VariantsTabProps) {
   const [showForm, setShowForm] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [adjusting, setAdjusting] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<VariantForm>({
     resolver: zodResolver(variantSchema),
@@ -109,7 +111,7 @@ export function VariantsTab({ productId, variants }: VariantsTabProps) {
             <div key={v._id} className={styles.variantRow}>
               <span className={styles.variantCell}>{v.size}</span>
               <span className={styles.variantCell}>{v.color}</span>
-              <Badge variant={v.stock === 0 ? 'error' : v.stock <= 5 ? 'warning' : 'success'}>{v.stock}</Badge>
+              <Badge variant={getStockBadgeVariant(v.stock)}>{v.stock}</Badge>
               <span className={styles.variantCell}>{v.price ? `₹${v.price}` : '—'}</span>
               <div className={styles.variantActions}>
                 <button
@@ -130,7 +132,7 @@ export function VariantsTab({ productId, variants }: VariantsTabProps) {
                 </button>
                 <button
                   className={styles.deleteVariantBtn}
-                  onClick={() => onDelete(v._id)}
+                  onClick={() => setDeleteTarget(v._id)}
                   disabled={deleting === v._id}
                   aria-label="Delete variant"
                 >
@@ -141,6 +143,17 @@ export function VariantsTab({ productId, variants }: VariantsTabProps) {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete variant?"
+        description="This will permanently remove this variant. This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={() => { if (deleteTarget) onDelete(deleteTarget); setDeleteTarget(null); }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

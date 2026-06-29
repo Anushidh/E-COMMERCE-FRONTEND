@@ -2,8 +2,6 @@
 .loader { display: flex; justify-content: center; padding: var(--space-16); }
 .notFound { padding: var(--space-16); text-align: center; color: var(--text-secondary); }
 .header { display: flex; flex-direction: column; gap: var(--space-2); }
-.back { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); color: var(--text-secondary); transition: var(--transition-colors); width: fit-content; }
-.back:hover { color: var(--text-primary); }
 .title { font-size: var(--text-lg); font-weight: var(--weight-medium); }
 .tabs { display: flex; flex-direction: column; gap: var(--space-6); }
 .tabList { display: flex; gap: var(--space-1); border-bottom: 1px solid var(--border-secondary); }

@@ -73,7 +73,6 @@
   display: flex;
   align-items: center;
   color: var(--text-tertiary);
-  pointer-events: none;
 }
 
 .leftIcon {

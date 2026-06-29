@@ -7,13 +7,14 @@ import { useDeleteProduct } from '@/hooks/useAdmin';
 import { adminService } from '@/services/admin.service';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Button, Badge, Spinner, Input } from '@shared/components';
+import { Button, Badge, TableSkeleton, Input, ConfirmDialog } from '@shared/components';
 import styles from './Products.module.css';
 import { getStatusBadgeVariant } from '@/shared/utils/badge';
 
 export default function Products() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const { data, isLoading } = useProducts({ page: String(page), limit: '20', search: search || undefined });
   const { mutate: deleteProduct } = useDeleteProduct();
   const qc = useQueryClient();
@@ -40,19 +41,7 @@ export default function Products() {
 ) => {
   e.preventDefault();
   e.stopPropagation();
-
-  toast("Delete product?", {
-    description: `This will permanently delete "${productName}".`,
-    action: {
-      label: "Delete",
-      onClick: () => deleteProduct(productId),
-    },
-    cancel: {
-      label: "Cancel",
-      onClick: () => {},
-    },
-    duration: 10000,
-  });
+  setDeleteTarget({ id: productId, name: productName });
 };
 
   return (
@@ -77,7 +66,7 @@ export default function Products() {
         </div>
 
         {isLoading ? (
-          <div className={styles.loader}><Spinner size="lg" /></div>
+          <TableSkeleton columns={7} gridTemplate="50px 1fr 90px 50px 100px 60px 60px" />
         ) : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
@@ -135,6 +124,17 @@ export default function Products() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete product?"
+        description={`This will permanently delete "${deleteTarget?.name}". This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={() => { if (deleteTarget) deleteProduct(deleteTarget.id); setDeleteTarget(null); }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   );
 }

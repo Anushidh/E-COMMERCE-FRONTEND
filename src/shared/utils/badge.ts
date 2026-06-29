@@ -39,3 +39,37 @@ export const getUserStatusBadgeVariant = (
   return isBlocked ? 'error' : 'success';
 };
 
+export const getOrderStatusBadgeVariant = (status: string): BadgeVariant => {
+  switch (status) {
+    case 'Delivered':
+      return 'success';
+    case 'Cancelled':
+    case 'Returned':
+      return 'error';
+    case 'Return Requested':
+      return 'warning';
+    case 'Shipped':
+    case 'Out for Delivery':
+      return 'info';
+    default:
+      return 'default';
+  }
+};
+
+export const getPaymentStatusBadgeVariant = (status: string): BadgeVariant => {
+  switch (status) {
+    case 'Paid':
+      return 'success';
+    case 'Failed':
+      return 'error';
+    case 'Refunded':
+      return 'warning';
+    default:
+      return 'default';
+  }
+};
+
+export const getOfferStatusBadgeVariant = (isActive: boolean): BadgeVariant => {
+  return isActive ? 'success' : 'error';
+};
+

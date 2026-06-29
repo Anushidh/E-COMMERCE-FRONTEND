@@ -30,3 +30,75 @@
   gap: var(--space-2);
   padding: var(--space-2) 0;
 }
+
+/* Table skeleton */
+.tableWrapper {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.tableHeaderSkeleton {
+  display: grid;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-secondary);
+  gap: var(--space-3);
+}
+
+.tableRowSkeleton {
+  display: grid;
+  padding: var(--space-4) var(--space-4);
+  border-bottom: 1px solid var(--border-secondary);
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.tableRowSkeleton:last-child {
+  border-bottom: none;
+}
+
+/* Card grid skeleton */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+
+.cardSkeleton {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.cardSkeletonBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+/* List skeleton */
+.listSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.listItemSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.listItemHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-1);
+}

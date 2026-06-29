@@ -1,7 +1,8 @@
 import { Helmet } from 'react-helmet-async';
 import { AlertTriangle } from 'lucide-react';
 import { useLowStock, useAdjustStock } from '@/hooks/useAdmin';
-import { Button, Badge, Spinner } from '@shared/components';
+import { Button, Badge, TableSkeleton } from '@shared/components';
+import { getStockBadgeVariant } from '@/shared/utils/badge';
 import styles from './Inventory.module.css';
 
 export default function Inventory() {
@@ -17,7 +18,7 @@ export default function Inventory() {
           <Badge variant="warning"><AlertTriangle size={12} /> {variants?.length || 0} items</Badge>
         </div>
 
-        {isLoading ? <Spinner size="lg" /> : (
+        {isLoading ? <TableSkeleton columns={4} gridTemplate="1fr 120px 70px 140px" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
               <span>Product</span><span>Variant</span><span>Stock</span><span>Action</span>
@@ -26,7 +27,7 @@ export default function Inventory() {
               <div key={v._id} className={styles.tableRow}>
                 <span className={styles.product}>{v.product.name}</span>
                 <span>{v.size} / {v.color}</span>
-                <Badge variant={v.stock === 0 ? 'error' : 'warning'}>{v.stock}</Badge>
+                <Badge variant={getStockBadgeVariant(v.stock)}>{v.stock}</Badge>
                 <div className={styles.actions}>
                   <Button size="sm" variant="secondary" loading={isPending}
                     onClick={() => adjust({ variantId: v._id, adjustment: 10 })}>

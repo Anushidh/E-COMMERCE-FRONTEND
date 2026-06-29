@@ -1,8 +1,7 @@
-import { useParams, useNavigate } from 'react-router';
+import { useParams } from 'react-router';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft } from 'lucide-react';
 import * as Tabs from '@radix-ui/react-tabs';
-import { Spinner } from '@shared/components';
+import { Spinner, BackButton } from '@shared/components';
 import { useProductDetail } from '@/hooks/useProducts';
 import { GeneralTab } from './tabs/GeneralTab';
 import { ImagesTab } from './tabs/ImagesTab';
@@ -11,7 +10,6 @@ import styles from './ProductEdit.module.css';
 
 export default function ProductEdit() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { data, isLoading } = useProductDetail(id || '');
 
   if (isLoading) {
@@ -29,9 +27,7 @@ export default function ProductEdit() {
       <Helmet><title>{product.name} — Edit — Admin</title></Helmet>
       <div className={styles.page}>
         <div className={styles.header}>
-          <button className={styles.back} onClick={() => navigate('/admin/products')}>
-            <ArrowLeft size={16} /> Products
-          </button>
+          <BackButton to="/admin/products" label="Products" />
           <h1 className={styles.title}>{product.name}</h1>
         </div>
 

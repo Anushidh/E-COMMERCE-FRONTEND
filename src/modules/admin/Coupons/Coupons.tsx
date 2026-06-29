@@ -5,7 +5,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAdminCoupons, useCreateCoupon, useDeleteCoupon } from '@/hooks/useAdmin';
-import { Button, Badge, Spinner, Input, Modal } from '@shared/components';
+import { Button, Badge, TableSkeleton, Input, Modal, ConfirmDialog } from '@shared/components';
+import { getOfferStatusBadgeVariant } from '@/shared/utils/badge';
 import styles from './Coupons.module.css';
 
 const couponSchema = z.object({
@@ -23,13 +24,19 @@ type CouponForm = z.infer<typeof couponSchema>;
 
 export default function Coupons() {
   const [showCreate, setShowCreate] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; code: string } | null>(null);
   const { data: coupons, isLoading } = useAdminCoupons();
   const { mutate: create, isPending: creating } = useCreateCoupon();
   const { mutate: deleteCoupon } = useDeleteCoupon();
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<CouponForm>({
+  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<CouponForm>({
     resolver: zodResolver(couponSchema),
   });
+
+  // Check if any field has a value for create form
+  const couponValues = watch();
+  const isCouponDirty = !!(couponValues.code || couponValues.discountValue || couponValues.totalUsageLimit || couponValues.expiryDate);
 
   const onSubmit = (data: CouponForm) => {
     create(data, { onSuccess: () => { reset(); setShowCreate(false); } });
@@ -44,7 +51,7 @@ export default function Coupons() {
           <Button size="sm" leftIcon={<Plus size={14} />} onClick={() => setShowCreate(true)}>Create</Button>
         </div>
 
-        {isLoading ? <Spinner size="lg" /> : (
+        {isLoading ? <TableSkeleton columns={7} gridTemplate="120px 90px 80px 80px 100px 80px 40px" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
               <span>Code</span><span>Type</span><span>Value</span><span>Used</span><span>Expiry</span><span>Status</span><span></span>
@@ -56,17 +63,19 @@ export default function Coupons() {
                 <span>{c.discountType === 'percentage' ? `${c.discountValue}%` : `₹${c.discountValue}`}</span>
                 <span>{c.totalUsed}/{c.totalUsageLimit}</span>
                 <span>{new Date(c.expiryDate).toLocaleDateString('en-IN')}</span>
-                <Badge variant={c.isActive && new Date(c.expiryDate) > new Date() ? 'success' : 'error'}>
+                <Badge variant={getOfferStatusBadgeVariant(c.isActive && new Date(c.expiryDate) > new Date())}>
                   {c.isActive && new Date(c.expiryDate) > new Date() ? 'Active' : 'Expired'}
                 </Badge>
-                <button className={styles.deleteBtn} onClick={() => deleteCoupon(c._id)} aria-label="Delete"><Trash2 size={14} /></button>
+                <button className={styles.deleteBtn} onClick={() => setDeleteTarget({ id: c._id, code: c.code })} aria-label="Delete"><Trash2 size={14} /></button>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Create Coupon" size="md">
+      <Modal open={showCreate} onClose={() => {
+        if (isCouponDirty) { setConfirmClose(true); } else { setShowCreate(false); reset(); }
+      }} title="Create Coupon" size="md">
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <Input label="Code" placeholder="SAVE20" error={errors.code?.message} {...register('code')} />
           <div className={styles.row}>
@@ -91,6 +100,28 @@ export default function Coupons() {
           <Button type="submit" fullWidth loading={creating}>Create Coupon</Button>
         </form>
       </Modal>
+
+      <ConfirmDialog
+        open={confirmClose}
+        title="Discard changes?"
+        description="You have unsaved changes in the coupon form. Are you sure you want to close?"
+        confirmLabel="Discard"
+        cancelLabel="Keep editing"
+        variant="warning"
+        onConfirm={() => { setConfirmClose(false); reset(); setShowCreate(false); }}
+        onCancel={() => setConfirmClose(false)}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete coupon?"
+        description={`This will permanently delete coupon "${deleteTarget?.code}". This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={() => { if (deleteTarget) deleteCoupon(deleteTarget.id); setDeleteTarget(null); }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   );
 }

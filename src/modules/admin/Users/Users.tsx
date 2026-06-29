@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useAdminUsers, useBlockUser, useUnblockUser } from '@/hooks/useAdmin';
-import { Button, Badge, Spinner, Input } from '@shared/components';
+import { Button, Badge, TableSkeleton, Input } from '@shared/components';
 import styles from './Users.module.css';
 import { getUserStatusBadgeVariant } from '@/shared/utils/badge';
 
@@ -23,7 +23,7 @@ export default function Users() {
           </div>
         </div>
 
-        {isLoading ? <Spinner size="lg" /> : (
+        {isLoading ? <TableSkeleton columns={5} gridTemplate="1fr 1fr 90px 100px 90px" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
               <span>Name</span>

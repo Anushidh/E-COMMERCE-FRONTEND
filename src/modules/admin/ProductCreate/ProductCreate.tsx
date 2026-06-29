@@ -3,8 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router';
-import { ArrowLeft } from 'lucide-react';
-import { Button, Input } from '@shared/components';
+import { Button, Input, BackButton, ConfirmDialog } from '@shared/components';
 import { useCreateProduct } from '@/hooks/useAdmin';
 import { useCategories } from '@/hooks/useCategories';
 import { useState } from 'react';
@@ -28,11 +27,16 @@ export default function ProductCreate() {
   const { data: categories } = useCategories();
   const { mutate: createProduct, isPending } = useCreateProduct();
   const [images, setImages] = useState<File[]>([]);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<ProductForm>({
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<ProductForm>({
     resolver: zodResolver(productSchema),
-    defaultValues: { gender: 'Unisex', gstRate: 18 },
+    defaultValues: { name: '', description: '', brand: '', category: '', gender: 'Unisex', basePrice: 0, gstRate: 18 },
   });
+
+  // Check if any field has a meaningful value
+  const productValues = watch();
+  const isProductDirty = !!(productValues.name || productValues.description || productValues.brand || productValues.category) || images.length > 0;
 
   const { ref: formRef, handleKeyDown } = useFocusTrap<HTMLFormElement>();
 
@@ -53,9 +57,7 @@ export default function ProductCreate() {
       <Helmet><title>Add Product — Admin</title></Helmet>
       <div className={styles.page}>
         <div className={styles.header}>
-          <button className={styles.back} onClick={() => navigate('/admin/products')}>
-            <ArrowLeft size={16} /> Back
-          </button>
+          <BackButton to="/admin/products" label="Back" isDirty={isProductDirty} />
           <h1 className={styles.title}>New Product</h1>
         </div>
 
@@ -133,11 +135,28 @@ export default function ProductCreate() {
           </div>
 
           <div className={styles.actions}>
-            <Button type="button" variant="secondary" onClick={() => navigate('/admin/products')}>Cancel</Button>
+            <Button type="button" variant="secondary" onClick={() => {
+              if (isProductDirty) {
+                setShowCancelConfirm(true);
+              } else {
+                navigate('/admin/products');
+              }
+            }}>Cancel</Button>
             <Button type="submit" loading={isPending}>Create Product</Button>
           </div>
         </form>
       </div>
+
+      <ConfirmDialog
+        open={showCancelConfirm}
+        title="Discard new product?"
+        description="You have unsaved changes. Are you sure you want to leave without saving?"
+        confirmLabel="Discard"
+        cancelLabel="Keep editing"
+        variant="warning"
+        onConfirm={() => { setShowCancelConfirm(false); navigate('/admin/products'); }}
+        onCancel={() => setShowCancelConfirm(false)}
+      />
     </>
   );
 }

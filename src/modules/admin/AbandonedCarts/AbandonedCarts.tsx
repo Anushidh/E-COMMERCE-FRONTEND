@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { ShoppingCart, Send } from 'lucide-react';
 import { useAbandonedCarts, useProcessAbandonedCarts } from '@/hooks/useAdmin';
-import { Button, Badge, Spinner } from '@shared/components';
+import { Button, Badge, TableSkeleton } from '@shared/components';
 import styles from './AbandonedCarts.module.css';
 
 export default function AbandonedCarts() {
@@ -26,7 +26,7 @@ export default function AbandonedCarts() {
           </Button>
         </div>
 
-        {isLoading ? <Spinner size="lg" /> : (
+        {isLoading ? <TableSkeleton columns={4} gridTemplate="1fr 80px 100px 120px" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
               <span>Customer</span><span>Items</span><span>Value</span><span>Inactive Since</span>
