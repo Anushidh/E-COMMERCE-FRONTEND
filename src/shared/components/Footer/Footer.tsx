@@ -32,10 +32,10 @@ export function Footer() {
           {/* Info */}
           <div className={styles.column}>
             <h4 className={styles.columnTitle}>Info</h4>
-            <span className={styles.link}>About Us</span>
-            <span className={styles.link}>Contact</span>
-            <span className={styles.link}>Shipping Policy</span>
-            <span className={styles.link}>Returns & Refunds</span>
+            <Link to="/about" className={styles.link}>About Us</Link>
+            <Link to="/contact" className={styles.link}>Contact</Link>
+            <Link to="/shipping-policy" className={styles.link}>Shipping Policy</Link>
+            <Link to="/returns-refunds" className={styles.link}>Returns & Refunds</Link>
           </div>
         </div>
 

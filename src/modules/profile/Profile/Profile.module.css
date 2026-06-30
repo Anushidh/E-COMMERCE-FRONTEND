@@ -1,12 +1,137 @@
-.page { max-width: 600px; margin-inline: auto; padding: var(--space-8) var(--gutter-mobile); display: flex; flex-direction: column; gap: var(--space-8); }
-@media (min-width: 768px) { .page { padding: var(--space-12) var(--gutter-tablet); } }
-.loader { display: flex; justify-content: center; min-height: 50vh; align-items: center; }
-.header { display: flex; align-items: center; gap: var(--space-4); }
-.avatar { width: 4rem; height: 4rem; border-radius: var(--radius-full); overflow: hidden; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); flex-shrink: 0; }
-.avatarImg { width: 100%; height: 100%; object-fit: cover; }
-.name { font-size: var(--text-xl); font-weight: var(--weight-medium); }
-.email { font-size: var(--text-sm); color: var(--text-secondary); }
-.nav { display: flex; flex-direction: column; gap: var(--space-1); }
-.navItem { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--border-secondary); border-radius: var(--radius-md); font-size: var(--text-sm); font-weight: var(--weight-medium); transition: var(--transition-colors); }
-.navItem:hover { border-color: var(--color-gray-300); background: var(--bg-secondary); }
-.actions { border-top: 1px solid var(--border-secondary); padding-top: var(--space-4); }
+.page {
+  max-width: 900px;
+  margin-inline: auto;
+  padding: var(--space-8) var(--gutter-mobile);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding: var(--space-12) var(--gutter-tablet);
+  }
+}
+
+/* ─── Profile Header ──────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  background: var(--color-gray-100);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+}
+
+.avatar {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background: var(--color-white);
+  border: 2px solid var(--border-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.headerInfo {
+  flex: 1;
+}
+
+.name {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.email {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+}
+
+/* ─── Card Grid ────────────────────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 480px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card:hover {
+  border-color: var(--color-gray-300);
+  box-shadow: var(--shadow-sm);
+}
+
+.cardIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  background: var(--color-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+}
+
+.cardTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.cardDesc {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ─── Logout ───────────────────────────────────────────────────────────────── */
+.logoutSection {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-secondary);
+}
+
+.logoutSection button {
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.logoutSection button:hover {
+  color: var(--color-error);
+  background-color: var(--color-error-light);
+}

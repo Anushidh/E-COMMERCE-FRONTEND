@@ -4,6 +4,7 @@
   border: 1px solid var(--border-secondary);
   border-radius: var(--radius-md);
   background-color: var(--bg-secondary);
+  overflow: hidden;
 }
 
 .header {

@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'sonner';
+import { ScrollToTop } from '@shared/components/ScrollToTop/ScrollToTop';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,6 +24,7 @@ export function Providers({ children }: ProvidersProps) {
     <QueryClientProvider client={queryClient}>
       <HelmetProvider>
         <BrowserRouter>
+          <ScrollToTop />
           {children}
           <Toaster
             position="bottom-right"

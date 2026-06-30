@@ -2,6 +2,7 @@ import { useSearchParams } from 'react-router';
 import { Helmet } from 'react-helmet-async';
 import { SlidersHorizontal } from 'lucide-react';
 import { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { ProductCard, ProductCardSkeleton, Button, Select } from '@shared/components';
 import { useProducts } from '@/hooks/useProducts';
 import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from '@/hooks/useWishlist';
@@ -83,7 +84,7 @@ export default function Shop() {
             </div>
             <Button
               variant="secondary"
-              size="sm"
+              size="md"
               leftIcon={<SlidersHorizontal size={14} />}
               onClick={() => setFiltersOpen(!filtersOpen)}
               className={styles.filterBtn}
@@ -94,14 +95,16 @@ export default function Shop() {
         </div>
 
         {/* Filters panel */}
-        {filtersOpen && (
-          <ShopFilters
-            filters={filters}
-            onFilterChange={updateFilter}
-            onClear={clearFilters}
-            onClose={() => setFiltersOpen(false)}
-          />
-        )}
+        <AnimatePresence>
+          {filtersOpen && (
+            <ShopFilters
+              filters={filters}
+              onFilterChange={updateFilter}
+              onClear={clearFilters}
+              onClose={() => setFiltersOpen(false)}
+            />
+          )}
+        </AnimatePresence>
 
         {/* Product grid */}
         <div className={styles.grid}>

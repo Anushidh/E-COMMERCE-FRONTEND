@@ -14,6 +14,10 @@ const Home = lazy(() => import('@modules/home/Home/Home'));
 const Shop = lazy(() => import('@modules/products/Shop/Shop'));
 const ProductDetail = lazy(() => import('@modules/products/ProductDetail/ProductDetail'));
 const Cart = lazy(() => import('@modules/cart/Cart/Cart'));
+const AboutUs = lazy(() => import('@modules/info/AboutUs'));
+const Contact = lazy(() => import('@modules/info/Contact'));
+const ShippingPolicy = lazy(() => import('@modules/info/ShippingPolicy'));
+const ReturnsRefunds = lazy(() => import('@modules/info/ReturnsRefunds'));
 
 // Protected user pages
 const Checkout = lazy(() => import('@modules/checkout/Checkout/Checkout'));
@@ -71,6 +75,10 @@ export function AppRouter() {
           <Route path="shop" element={<Shop />} />
           <Route path="shop/:slug" element={<ProductDetail />} />
           <Route path="cart" element={<Cart />} />
+          <Route path="about" element={<AboutUs />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="shipping-policy" element={<ShippingPolicy />} />
+          <Route path="returns-refunds" element={<ReturnsRefunds />} />
 
           {/* Protected user routes */}
           <Route path="checkout" element={<AuthGuard><Checkout /></AuthGuard>} />

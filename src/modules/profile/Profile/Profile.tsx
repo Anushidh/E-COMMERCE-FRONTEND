@@ -1,11 +1,51 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router';
-import { User, MapPin, Lock, Gift, Wallet, Settings } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Package, MapPin, Heart, Gift, Wallet, Settings, User, LogOut } from 'lucide-react';
 import { useProfile } from '@/hooks/useUser';
 import { useLogout } from '@/hooks/useAuth';
 import { Button, Skeleton, ConfirmDialog } from '@shared/components';
 import styles from './Profile.module.css';
+
+const NAV_CARDS = [
+  {
+    to: '/orders',
+    icon: Package,
+    title: 'My Orders',
+    desc: 'Track, return, or review your purchases',
+  },
+  {
+    to: '/profile/addresses',
+    icon: MapPin,
+    title: 'Addresses',
+    desc: 'Manage your saved delivery addresses',
+  },
+  {
+    to: '/wallet',
+    icon: Wallet,
+    title: 'Wallet',
+    desc: 'Check balance, transactions & top-up',
+  },
+  {
+    to: '/referrals',
+    icon: Gift,
+    title: 'Referrals',
+    desc: 'Invite friends and earn rewards',
+  },
+  {
+    to: '/wishlist',
+    icon: Heart,
+    title: 'Wishlist',
+    desc: 'Items you saved for later',
+  },
+  {
+    to: '/profile/settings',
+    icon: Settings,
+    title: 'Account Settings',
+    desc: 'Update password, email & preferences',
+  },
+];
 
 export default function Profile() {
   const { data: profile, isLoading } = useProfile();
@@ -16,15 +56,15 @@ export default function Profile() {
     return (
       <div className={styles.page}>
         <div className={styles.header}>
-          <Skeleton width="4rem" height="4rem" borderRadius="var(--radius-full)" />
+          <Skeleton width="4.5rem" height="4.5rem" borderRadius="var(--radius-full)" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <Skeleton width="140px" height="1.25rem" />
             <Skeleton width="200px" height="0.875rem" />
           </div>
         </div>
-        <div className={styles.nav}>
-          {[1, 2, 3, 4, 5].map((i) => (
-            <Skeleton key={i} width="100%" height="3.5rem" borderRadius="var(--radius-md)" />
+        <div className={styles.grid}>
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Skeleton key={i} width="100%" height="7rem" borderRadius="var(--radius-lg)" />
           ))}
         </div>
       </div>
@@ -36,28 +76,56 @@ export default function Profile() {
     <>
       <Helmet><title>Profile — STORE</title></Helmet>
       <div className={styles.page}>
+        {/* Profile Header */}
         <div className={styles.header}>
           <div className={styles.avatar}>
-            {profile.avatar ? <img src={profile.avatar} alt="" className={styles.avatarImg} /> : <User size={32} />}
+            {profile.avatar
+              ? <img src={profile.avatar} alt="" className={styles.avatarImg} />
+              : <User size={32} />
+            }
           </div>
-          <div>
+          <div className={styles.headerInfo}>
             <h1 className={styles.name}>{profile.name}</h1>
             <p className={styles.email}>{profile.email}</p>
           </div>
         </div>
 
-        <nav className={styles.nav}>
-          <Link to="/orders" className={styles.navItem}><User size={16} /> My Orders</Link>
-          <Link to="/profile/addresses" className={styles.navItem}><MapPin size={16} /> Addresses</Link>
-          <Link to="/wallet" className={styles.navItem}><Wallet size={16} /> Wallet</Link>
-          <Link to="/referrals" className={styles.navItem}><Gift size={16} /> Referrals</Link>
-          <Link to="/wishlist" className={styles.navItem}><Lock size={16} /> Wishlist</Link>
-          <Link to="/profile/settings" className={styles.navItem}><Settings size={16} /> Account Settings</Link>
-        </nav>
-
-        <div className={styles.actions}>
-          <Button variant="ghost" onClick={() => setShowLogoutConfirm(true)}>Logout</Button>
+        {/* Navigation Cards */}
+        <div className={styles.grid}>
+          {NAV_CARDS.map(({ to, icon: Icon, title, desc }, index) => (
+            <motion.div
+              key={to}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.08, ease: 'easeOut' }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+            >
+              <Link to={to} className={styles.card}>
+                <div className={styles.cardIcon}>
+                  <Icon size={20} />
+                </div>
+                <span className={styles.cardTitle}>{title}</span>
+                <span className={styles.cardDesc}>{desc}</span>
+              </Link>
+            </motion.div>
+          ))}
         </div>
+
+        {/* Logout */}
+        <motion.div
+          className={styles.logoutSection}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.6 }}
+        >
+          <Button
+            variant="ghost"
+            leftIcon={<LogOut size={16} />}
+            onClick={() => setShowLogoutConfirm(true)}
+          >
+            Log out
+          </Button>
+        </motion.div>
       </div>
 
       <ConfirmDialog

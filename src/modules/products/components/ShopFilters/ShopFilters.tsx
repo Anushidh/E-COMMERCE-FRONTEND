@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Button, Input } from '@shared/components';
 import { useCategories } from '@/hooks/useCategories';
 import type { ProductFilters } from '@shared/types/product';
@@ -18,7 +19,13 @@ export function ShopFilters({ filters, onFilterChange, onClear, onClose }: ShopF
   const { data: categories } = useCategories();
 
   return (
-    <div className={styles.panel}>
+    <motion.div
+      className={styles.panel}
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: 'auto' }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+    >
       <div className={styles.header}>
         <h2 className={styles.title}>Filters</h2>
         <button className={styles.closeBtn} onClick={onClose} aria-label="Close filters">
@@ -121,6 +128,6 @@ export function ShopFilters({ filters, onFilterChange, onClear, onClose }: ShopF
           Apply
         </Button>
       </div>
-    </div>
+    </motion.div>
   );
 }
