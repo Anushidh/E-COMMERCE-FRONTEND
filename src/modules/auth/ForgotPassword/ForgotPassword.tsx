@@ -7,6 +7,7 @@ import { Link } from 'react-router';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button, Input } from '@shared/components';
 import { useForgotPassword, useResetPassword } from '@/hooks/useAuth';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import styles from './ForgotPassword.module.css';
 
 const emailSchema = z.object({
@@ -28,6 +29,7 @@ export default function ForgotPassword() {
 
   const { mutate: forgotPassword, isPending: emailPending } = useForgotPassword();
   const { mutate: resetPassword, isPending: resetPending } = useResetPassword();
+  const { ref: cardRef, handleKeyDown } = useFocusTrap<HTMLDivElement>();
 
   const emailForm = useForm<EmailForm>({
     resolver: zodResolver(emailSchema),
@@ -55,7 +57,7 @@ export default function ForgotPassword() {
       <Helmet>
         <title>Reset Password — STORE</title>
       </Helmet>
-      <div className={styles.card}>
+      <div className={styles.card} ref={cardRef} onKeyDown={handleKeyDown}>
         <div className={styles.header}>
           <h1 className={styles.title}>
             {step === 'email' ? 'Reset password' : 'New password'}
@@ -74,6 +76,7 @@ export default function ForgotPassword() {
               type="email"
               placeholder="you@example.com"
               autoComplete="email"
+              autoFocus
               error={emailForm.formState.errors.email?.message}
               {...emailForm.register('email')}
             />
@@ -82,12 +85,16 @@ export default function ForgotPassword() {
             </Button>
           </form>
         ) : (
-          <form onSubmit={resetForm.handleSubmit(onReset)} className={styles.form}>
+          <form onSubmit={resetForm.handleSubmit(onReset)} className={styles.form} autoComplete="off">
+            {/* Hidden field to absorb Chrome autofill */}
+            <input type="email" name="hidden-email" autoComplete="email" style={{ display: 'none' }} tabIndex={-1} aria-hidden="true" />
             <Input
               label="Verification code"
+              type="tel"
               placeholder="000000"
               maxLength={6}
-              autoComplete="one-time-code"
+              autoComplete="off"
+              autoFocus
               error={resetForm.formState.errors.otp?.message}
               {...resetForm.register('otp')}
             />

@@ -1,24 +1,143 @@
 .layout {
   display: flex;
-  align-items: center;
-  justify-content: center;
   min-height: 100vh;
-  padding: var(--space-4);
-  background-color: var(--bg-secondary);
 }
 
-.container {
-  width: 100%;
-  max-width: 520px;
+/* ─── Left Brand Panel ─────────────────────────────────────────────────────── */
+.brandPanel {
+  display: none;
+  position: relative;
+  flex: 1;
+  background-color: var(--color-black);
+  color: var(--color-white);
+  overflow: hidden;
+}
+
+.brandContent {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-8);
+  justify-content: space-between;
+  height: 100%;
+  padding: var(--space-10) var(--space-12);
 }
 
-.logo {
+.brandLogo {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-white);
+  text-decoration: none;
+}
+
+.brandMessage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.brandHeadline {
+  font-size: var(--text-5xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  line-height: 1.1;
+}
+
+.brandSubtext {
+  font-size: var(--text-md);
+  color: var(--color-gray-400);
+  max-width: 48ch;
+  line-height: 1.6;
+}
+
+.brandFeatures {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  list-style: none;
+  padding: 0;
+  margin: var(--space-4) 0 0;
+}
+
+.brandFeatures li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-gray-300);
+}
+
+.brandFeatures li::before {
+  content: '✓';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--radius-full);
+  background-color: rgba(255, 255, 255, 0.1);
+  font-size: 0.625rem;
+  flex-shrink: 0;
+}
+
+.brandFooter {
+  font-size: var(--text-xs);
+  color: var(--color-gray-500);
+}
+
+/* Decorative grid pattern */
+.brandPattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 4rem 4rem;
+}
+
+/* ─── Right Form Panel ─────────────────────────────────────────────────────── */
+.formPanel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background-color: var(--bg-primary);
+  overflow-y: auto;
+}
+
+.formContainer {
+  width: 100%;
+  max-width: 24rem;
+}
+
+/* Mobile logo (shown only when brand panel is hidden) */
+.mobileLogo {
+  display: block;
+  text-align: center;
+  margin-bottom: var(--space-8);
   font-size: var(--text-xl);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-wider);
   color: var(--text-primary);
+  text-decoration: none;
+}
+
+/* ─── Responsive ───────────────────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .brandPanel {
+    display: flex;
+  }
+
+  .mobileLogo {
+    display: none;
+  }
+
+  .formPanel {
+    flex: none;
+    width: 50%;
+    max-width: 40rem;
+  }
 }

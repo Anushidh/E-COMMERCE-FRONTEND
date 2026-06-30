@@ -1,24 +1,21 @@
 .card {
-  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
-  padding: var(--space-8);
-  background-color: var(--bg-primary);
-  border-radius: var(--radius-lg);
+  gap: var(--space-6);
 }
 
 .header {
-  text-align: center;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  text-align: center;
 }
 
 .title {
   font-size: var(--text-2xl);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-tight);
+  color: var(--text-primary);
 }
 
 .subtitle {
@@ -26,19 +23,49 @@
   color: var(--text-secondary);
 }
 
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--border-primary);
+}
+
+.dividerText {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+}
+
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+@media (max-width: 480px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .footer {
-  text-align: center;
-}
-
-.footerText {
   font-size: var(--text-sm);
   color: var(--text-secondary);
+  text-align: center;
 }
 
 .link {

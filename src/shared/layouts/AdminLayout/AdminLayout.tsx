@@ -3,6 +3,7 @@ import { Outlet, NavLink, Navigate, useLocation } from 'react-router';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '@shared/stores/authStore';
 import { useAdminLogout } from '@/hooks/useAuth';
+import { ConfirmDialog } from '@shared/components';
 import styles from './AdminLayout.module.css';
 
 interface NavItem {
@@ -45,6 +46,7 @@ export default function AdminLayout() {
   const { isAuthenticated, role } = useAuthStore();
   const { mutate: logout } = useAdminLogout();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const location = useLocation();
 
   // Auth guard — redirect to admin login if not authenticated as admin
@@ -93,7 +95,7 @@ export default function AdminLayout() {
           })}
         </nav>
         <div className={styles.sidebarFooter}>
-          <button className={styles.logoutBtn} onClick={() => logout()}>
+          <button className={styles.logoutBtn} onClick={() => setShowLogoutConfirm(true)}>
             Logout
           </button>
         </div>
@@ -111,6 +113,20 @@ export default function AdminLayout() {
           <Outlet />
         </main>
       </div>
+
+      <ConfirmDialog
+        open={showLogoutConfirm}
+        title="Log out?"
+        description="Are you sure you want to log out of the admin panel?"
+        confirmLabel="Log out"
+        cancelLabel="Cancel"
+        variant="warning"
+        onConfirm={() => {
+          setShowLogoutConfirm(false);
+          logout();
+        }}
+        onCancel={() => setShowLogoutConfirm(false)}
+      />
     </div>
   );
 }

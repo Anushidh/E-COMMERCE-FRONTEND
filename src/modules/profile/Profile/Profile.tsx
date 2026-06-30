@@ -1,14 +1,16 @@
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router';
 import { User, MapPin, Lock, Gift, Wallet, Settings } from 'lucide-react';
 import { useProfile } from '@/hooks/useUser';
 import { useLogout } from '@/hooks/useAuth';
-import { Button, Skeleton } from '@shared/components';
+import { Button, Skeleton, ConfirmDialog } from '@shared/components';
 import styles from './Profile.module.css';
 
 export default function Profile() {
   const { data: profile, isLoading } = useProfile();
   const { mutate: logout } = useLogout();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   if (isLoading) {
     return (
@@ -54,9 +56,23 @@ export default function Profile() {
         </nav>
 
         <div className={styles.actions}>
-          <Button variant="ghost" onClick={() => logout()}>Logout</Button>
+          <Button variant="ghost" onClick={() => setShowLogoutConfirm(true)}>Logout</Button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={showLogoutConfirm}
+        title="Log out?"
+        description="Are you sure you want to log out of your account?"
+        confirmLabel="Log out"
+        cancelLabel="Cancel"
+        variant="warning"
+        onConfirm={() => {
+          setShowLogoutConfirm(false);
+          logout();
+        }}
+        onCancel={() => setShowLogoutConfirm(false)}
+      />
     </>
   );
 }
