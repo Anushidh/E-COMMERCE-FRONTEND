@@ -113,6 +113,7 @@ export default function Shop() {
                   slug={product.slug}
                   name={product.name}
                   price={product.basePrice}
+                  discountedPrice={product.discountedPrice}
                   image={product.images[0] || '/placeholder.svg'}
                   isWishlisted={wishlistIds.has(product._id)}
                   onWishlistToggle={isAuthenticated ? () => {

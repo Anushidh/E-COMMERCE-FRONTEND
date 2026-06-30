@@ -125,3 +125,16 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
 }
+
+.priceCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.originalPrice {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-decoration: line-through;
+}

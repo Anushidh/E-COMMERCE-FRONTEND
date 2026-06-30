@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { AlertTriangle } from 'lucide-react';
 import { useLowStock, useAdjustStock } from '@/hooks/useAdmin';
@@ -8,6 +9,14 @@ import styles from './Inventory.module.css';
 export default function Inventory() {
   const { data: variants, isLoading } = useLowStock();
   const { mutate: adjust, isPending } = useAdjustStock();
+  const [adjustingId, setAdjustingId] = useState<string | null>(null);
+
+  const handleAdjust = (variantId: string, adjustment: number) => {
+    setAdjustingId(variantId);
+    adjust({ variantId, adjustment }, {
+      onSettled: () => setAdjustingId(null),
+    });
+  };
 
   return (
     <>
@@ -29,12 +38,14 @@ export default function Inventory() {
                 <span>{v.size} / {v.color}</span>
                 <Badge variant={getStockBadgeVariant(v.stock)}>{v.stock}</Badge>
                 <div className={styles.actions}>
-                  <Button size="sm" variant="secondary" loading={isPending}
-                    onClick={() => adjust({ variantId: v._id, adjustment: 10 })}>
+                  <Button size="sm" variant="secondary" loading={isPending && adjustingId === v._id}
+                    disabled={isPending && adjustingId !== v._id}
+                    onClick={() => handleAdjust(v._id, 10)}>
                     +10
                   </Button>
-                  <Button size="sm" variant="secondary" loading={isPending}
-                    onClick={() => adjust({ variantId: v._id, adjustment: 50 })}>
+                  <Button size="sm" variant="secondary" loading={isPending && adjustingId === v._id}
+                    disabled={isPending && adjustingId !== v._id}
+                    onClick={() => handleAdjust(v._id, 50)}>
                     +50
                   </Button>
                 </div>

@@ -47,6 +47,7 @@ export const getOrderStatusBadgeVariant = (status: string): BadgeVariant => {
     case 'Returned':
       return 'error';
     case 'Return Requested':
+    case 'Cancel Requested':
       return 'warning';
     case 'Shipped':
     case 'Out for Delivery':

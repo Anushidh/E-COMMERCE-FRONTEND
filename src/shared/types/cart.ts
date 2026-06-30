@@ -22,6 +22,7 @@ export interface CartItem {
   variant: CartItemVariant;
   quantity: number;
   price: number;
+  discountedPrice?: number | null;
 }
 
 export interface Cart {

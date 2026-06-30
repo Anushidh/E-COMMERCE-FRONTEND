@@ -67,7 +67,16 @@ export function useHandleReturn() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, action }: { id: string; action: 'approve' | 'reject' }) => adminService.handleReturn(id, action),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'orders'] }); toast.success('Return processed'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'orders'] }); qc.invalidateQueries({ queryKey: ['admin', 'order'] }); toast.success('Return processed'); },
+    onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
+  });
+}
+
+export function useHandleCancellation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, action }: { id: string; action: 'approve' | 'reject' }) => adminService.handleCancellation(id, action),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'orders'] }); qc.invalidateQueries({ queryKey: ['admin', 'order'] }); toast.success('Cancellation processed'); },
     onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
   });
 }

@@ -34,4 +34,7 @@ export const ordersService = {
 
   getInvoice: (id: string) =>
     apiClient.get<ApiResponse<Invoice>>(ENDPOINTS.ORDERS.INVOICE(id)),
+
+  retryPayment: (id: string) =>
+    apiClient.post<ApiResponse<RazorpayOrderResponse>>(ENDPOINTS.ORDERS.RETRY_PAYMENT(id)),
 };

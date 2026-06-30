@@ -59,6 +59,7 @@ export interface WishlistProduct {
   name: string;
   images: string[];
   basePrice: number;
+  discountedPrice?: number | null;
   status: string;
   averageRating: number;
   inStock: boolean;

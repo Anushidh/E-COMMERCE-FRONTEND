@@ -7,7 +7,7 @@ import { useCart } from '@/hooks/useCart';
 import { useProfile } from '@/hooks/useUser';
 import { useAvailableCoupons, useApplyCoupon } from '@/hooks/useCoupons';
 import { useWallet } from '@/hooks/useUser';
-import { usePlaceOrder } from '@/hooks/useOrders';
+import { usePlaceOrder, useVerifyPayment } from '@/hooks/useOrders';
 import styles from './Checkout.module.css';
 
 export default function Checkout() {
@@ -18,6 +18,7 @@ export default function Checkout() {
   const { data: coupons } = useAvailableCoupons();
   const { mutate: applyCoupon, data: couponResult } = useApplyCoupon();
   const { mutate: placeOrder, isPending: placing } = usePlaceOrder();
+  const { mutateAsync: verifyPaymentAsync } = useVerifyPayment();
 
   const [selectedAddress, setSelectedAddress] = useState<string>('');
   const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'cod' | 'wallet'>('razorpay');
@@ -53,20 +54,27 @@ export default function Checkout() {
   }
 
   const subtotal = cart.totalAmount;
+  const offerSavings = cart.items.reduce((sum, item) => {
+    if (item.discountedPrice) {
+      return sum + (item.price - item.discountedPrice) * item.quantity;
+    }
+    return sum;
+  }, 0);
+  const afterOffers = subtotal - offerSavings;
   const discount = couponResult?.data.data?.discount || 0;
-  const shipping = (subtotal - discount) >= 499 ? 0 : 40;
+  const shipping = (afterOffers - discount) >= 499 ? 0 : 40;
   const walletBalance = wallet?.balance || 0;
   const walletDeduction = paymentMethod === 'wallet'
-    ? subtotal - discount + shipping
-    : useWalletBalance ? Math.min(walletBalance, subtotal - discount + shipping) : 0;
-  const total = Math.max(subtotal - discount - walletDeduction + shipping, 0);
+    ? afterOffers - discount + shipping
+    : useWalletBalance ? Math.min(walletBalance, afterOffers - discount + shipping) : 0;
+  const total = Math.max(afterOffers - discount - walletDeduction + shipping, 0);
 
   // If wallet covers the full amount via checkbox, auto-switch to wallet payment
   const effectivePaymentMethod = (useWalletBalance && total === 0 && paymentMethod !== 'wallet') ? 'wallet' : paymentMethod;
 
   const handleApplyCoupon = () => {
     if (couponCode.trim()) {
-      applyCoupon({ code: couponCode.trim(), orderTotal: subtotal });
+      applyCoupon({ code: couponCode.trim(), orderTotal: afterOffers });
     }
   };
 
@@ -87,7 +95,24 @@ export default function Checkout() {
             amount: data.razorpayOrder.amount,
             currency: data.razorpayOrder.currency,
             order_id: data.razorpayOrder.id,
-            handler: () => navigate(`/orders/${data.order._id}`),
+            handler: async (response: any) => {
+              try {
+                await verifyPaymentAsync({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                });
+              } catch {
+                // Even if verification fails, navigate to order page so user can retry
+              }
+              navigate(`/orders/${data.order._id}`);
+            },
+            modal: {
+              ondismiss: () => {
+                // User closed Razorpay modal without paying — navigate to order page where they can retry
+                navigate(`/orders/${data.order._id}`);
+              },
+            },
           };
           const rzp = new (window as any).Razorpay(options);
           rzp.open();
@@ -157,10 +182,12 @@ export default function Checkout() {
               </section>
             )}
 
-            {/* Payment — hide when wallet checkbox covers full amount */}
-            {!(useWalletBalance && total === 0) && (
-              <section className={styles.section}>
-                <h2 className={styles.sectionTitle}><CreditCard size={16} /> Payment Method</h2>
+            {/* Payment */}
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}><CreditCard size={16} /> Payment Method</h2>
+              {useWalletBalance && total === 0 ? (
+                <p className={styles.walletCovers}>Wallet balance covers the full amount. No additional payment needed.</p>
+              ) : (
                 <div className={styles.paymentOptions}>
                   <label className={`${styles.paymentOption} ${paymentMethod === 'razorpay' ? styles.paymentActive : ''}`}>
                     <input type="radio" name="payment" value="razorpay" checked={paymentMethod === 'razorpay'} onChange={() => setPaymentMethod('razorpay')} className="sr-only" />
@@ -178,8 +205,8 @@ export default function Checkout() {
                     {total < 500 && paymentMethod === 'cod' && <span className={styles.codWarning}>Min ₹500 for COD</span>}
                   </label>
                 </div>
-              </section>
-            )}
+              )}
+            </section>
           </div>
 
           {/* Summary */}
@@ -189,12 +216,13 @@ export default function Checkout() {
               {cart.items.map((item) => (
                 <div key={item._id} className={styles.summaryItem}>
                   <span>{item.product.name} × {item.quantity}</span>
-                  <span>₹{(item.price * item.quantity).toLocaleString('en-IN')}</span>
+                  <span>₹{((item.discountedPrice || item.price) * item.quantity).toLocaleString('en-IN')}</span>
                 </div>
               ))}
             </div>
             <div className={styles.summaryRows}>
               <div className={styles.summaryRow}><span>Subtotal</span><span>₹{subtotal.toLocaleString('en-IN')}</span></div>
+              {offerSavings > 0 && <div className={styles.summaryRow}><span>Offer Discount</span><span className={styles.green}>-₹{offerSavings.toFixed(2)}</span></div>}
               {discount > 0 && <div className={styles.summaryRow}><span>Coupon</span><span className={styles.green}>-₹{discount.toFixed(2)}</span></div>}
               {walletDeduction > 0 && <div className={styles.summaryRow}><span>Wallet</span><span className={styles.green}>-₹{walletDeduction.toFixed(2)}</span></div>}
               <div className={styles.summaryRow}><span><Truck size={14} /> Delivery</span><span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span></div>

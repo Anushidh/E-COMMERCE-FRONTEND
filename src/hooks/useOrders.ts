@@ -58,7 +58,20 @@ export function useVerifyPayment() {
     mutationFn: ordersService.verifyPayment,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['orders'] });
+      qc.invalidateQueries({ queryKey: ['order'] });
       toast.success('Payment verified!');
+    },
+    onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
+  });
+}
+
+export function useRetryPayment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ordersService.retryPayment,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['orders'] });
+      qc.invalidateQueries({ queryKey: ['order'] });
     },
     onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
   });
@@ -68,9 +81,10 @@ export function useCancelOrder() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) => ordersService.cancelOrder(id, reason),
-    onSuccess: () => {
+    onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ['orders'] });
-      toast.success('Order cancelled');
+      qc.invalidateQueries({ queryKey: ['order'] });
+      toast.success(res.data.message || 'Order cancelled');
     },
     onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
   });

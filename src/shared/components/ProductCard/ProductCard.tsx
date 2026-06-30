@@ -5,6 +5,7 @@ interface ProductCardProps {
   slug: string;
   name: string;
   price: number;
+  discountedPrice?: number | null;
   image: string;
   averageRating?: number;
   isWishlisted?: boolean;
@@ -16,6 +17,7 @@ export function ProductCard({
   slug,
   name,
   price,
+  discountedPrice,
   image,
   isWishlisted = false,
   onWishlistToggle,
@@ -40,7 +42,16 @@ export function ProductCard({
       )}
       <a href={`/shop/${slug}`} className={styles.info}>
         <h3 className={styles.name}>{name}</h3>
-        <p className={styles.price}>₹{price.toLocaleString('en-IN')}</p>
+        <div className={styles.priceRow}>
+          {discountedPrice ? (
+            <>
+              <p className={styles.price}>₹{discountedPrice.toLocaleString('en-IN')}</p>
+              <p className={styles.originalPrice}>₹{price.toLocaleString('en-IN')}</p>
+            </>
+          ) : (
+            <p className={styles.price}>₹{price.toLocaleString('en-IN')}</p>
+          )}
+        </div>
       </a>
     </article>
   );

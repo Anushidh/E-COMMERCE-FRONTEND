@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { FileText } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@shared/api/client';
-import { useUpdateOrderStatus, useHandleReturn } from '@/hooks/useAdmin';
+import { useUpdateOrderStatus, useHandleReturn, useHandleCancellation } from '@/hooks/useAdmin';
 import { Button, Badge, Skeleton, BackButton } from '@shared/components';
 import { getOrderStatusBadgeVariant, getPaymentStatusBadgeVariant } from '@/shared/utils/badge';
 import type { Order } from '@shared/types/order';
@@ -21,6 +21,7 @@ export default function AdminOrderDetail() {
   const { id } = useParams<{ id: string }>();
   const { mutate: updateStatus, isPending: updating } = useUpdateOrderStatus();
   const { mutate: handleReturn } = useHandleReturn();
+  const { mutate: handleCancellation } = useHandleCancellation();
 
   const { data: order, isLoading } = useQuery({
     queryKey: ['admin', 'order', id],
@@ -109,6 +110,12 @@ export default function AdminOrderDetail() {
             <>
               <Button size="sm" onClick={() => handleReturn({ id: order._id, action: 'approve' })}>Approve Return</Button>
               <Button size="sm" variant="ghost" onClick={() => handleReturn({ id: order._id, action: 'reject' })}>Reject Return</Button>
+            </>
+          )}
+          {order.orderStatus === 'Cancel Requested' && (
+            <>
+              <Button size="sm" onClick={() => handleCancellation({ id: order._id, action: 'approve' })}>Approve Cancellation</Button>
+              <Button size="sm" variant="ghost" onClick={() => handleCancellation({ id: order._id, action: 'reject' })}>Reject Cancellation</Button>
             </>
           )}
           {invoice?.pdfUrl && (

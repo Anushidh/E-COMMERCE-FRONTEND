@@ -58,9 +58,16 @@ export function CartItem({ item }: CartItemProps) {
               <Plus size={12} />
             </button>
           </div>
-          <span className={styles.price}>
-            ₹{(item.price * item.quantity).toLocaleString('en-IN')}
-          </span>
+          <div className={styles.priceCol}>
+            <span className={styles.price}>
+              ₹{((item.discountedPrice || item.price) * item.quantity).toLocaleString('en-IN')}
+            </span>
+            {item.discountedPrice && (
+              <span className={styles.originalPrice}>
+                ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>

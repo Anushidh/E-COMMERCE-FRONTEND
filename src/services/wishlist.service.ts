@@ -19,6 +19,9 @@ export const wishlistService = {
   removeFromWishlist: (productId: string) =>
     apiClient.delete<ApiResponse>(ENDPOINTS.WISHLIST.REMOVE(productId)),
 
+  clearWishlist: () =>
+    apiClient.delete<ApiResponse>(ENDPOINTS.WISHLIST.CLEAR),
+
   moveToCart: (productId: string, variantId: string) =>
     apiClient.post<ApiResponse>(ENDPOINTS.WISHLIST.MOVE_TO_CART, { productId, variantId }),
 };

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router';
 import { Helmet } from 'react-helmet-async';
 import { FileText } from 'lucide-react';
-import { useOrderDetail, useCancelOrder, useRequestReturn, useOrderInvoice } from '@/hooks/useOrders';
+import { useOrderDetail, useCancelOrder, useRequestReturn, useOrderInvoice, useRetryPayment, useVerifyPayment } from '@/hooks/useOrders';
 import { Button, Badge, Spinner, Input, Modal } from '@shared/components';
 import styles from './OrderDetail.module.css';
 
@@ -12,6 +12,8 @@ export default function OrderDetail() {
   const { data: invoice } = useOrderInvoice(id || '');
   const { mutate: cancelOrder, isPending: cancelling } = useCancelOrder();
   const { mutate: requestReturn, isPending: returning } = useRequestReturn();
+  const { mutateAsync: retryPayment, isPending: retrying } = useRetryPayment();
+  const { mutateAsync: verifyPaymentAsync } = useVerifyPayment();
 
   const [showCancel, setShowCancel] = useState(false);
   const [showReturn, setShowReturn] = useState(false);
@@ -20,7 +22,7 @@ export default function OrderDetail() {
   if (isLoading) return <div className={styles.loader}><Spinner size="lg" /></div>;
   if (!order) return <div className={styles.loader}>Order not found</div>;
 
-  const canCancel = ['Placed', 'Confirmed'].includes(order.orderStatus);
+  const canCancel = ['Placed', 'Confirmed', 'Shipped'].includes(order.orderStatus);
   const canReturn = order.orderStatus === 'Delivered';
 
   return (
@@ -92,7 +94,38 @@ export default function OrderDetail() {
               <Button variant="secondary" size="sm" leftIcon={<FileText size={14} />}>Download Invoice</Button>
             </a>
           )}
+          {order.paymentMethod === 'razorpay' && ['Pending', 'Failed'].includes(order.paymentStatus) && order.orderStatus !== 'Cancelled' && (
+            <Button size="sm" loading={retrying} onClick={async () => {
+              try {
+                const res = await retryPayment(order._id);
+                const data = res.data.data as any;
+                if (data?.razorpayOrder) {
+                  const options = {
+                    key: import.meta.env.VITE_RAZORPAY_KEY_ID || '',
+                    amount: data.razorpayOrder.amount,
+                    currency: data.razorpayOrder.currency,
+                    order_id: data.razorpayOrder.id,
+                    handler: async (response: any) => {
+                      try {
+                        await verifyPaymentAsync({
+                          razorpay_order_id: response.razorpay_order_id,
+                          razorpay_payment_id: response.razorpay_payment_id,
+                          razorpay_signature: response.razorpay_signature,
+                        });
+                      } catch { /* will show on page refresh */ }
+                      window.location.reload();
+                    },
+                  };
+                  const rzp = new (window as any).Razorpay(options);
+                  rzp.open();
+                }
+              } catch { /* error toast handled by hook */ }
+            }}>
+              Retry Payment
+            </Button>
+          )}
           {canCancel && <Button variant="danger" size="sm" onClick={() => setShowCancel(true)}>Cancel Order</Button>}
+          {order.orderStatus === 'Cancel Requested' && <Badge variant="warning">Cancellation Pending Approval</Badge>}
           {canReturn && <Button variant="secondary" size="sm" onClick={() => setShowReturn(true)}>Request Return</Button>}
         </div>
       </div>

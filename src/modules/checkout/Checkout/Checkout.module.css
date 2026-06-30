@@ -35,3 +35,5 @@
 .summaryRow { display: flex; justify-content: space-between; font-size: var(--text-sm); color: var(--text-secondary); }
 .green { color: var(--color-success); }
 .summaryTotal { display: flex; justify-content: space-between; font-size: var(--text-md); font-weight: var(--weight-semibold); margin-bottom: var(--space-5); }
+
+.walletCovers { font-size: var(--text-sm); color: var(--color-success); font-weight: var(--weight-medium); }

@@ -62,3 +62,17 @@ export function useMoveToCart() {
     },
   });
 }
+
+export function useClearWishlist() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: wishlistService.clearWishlist,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: WISHLIST_KEY });
+      toast.success('Wishlist cleared');
+    },
+    onError: (e: AxiosError<ErrorResponse>) => {
+      toast.error(e.response?.data?.message || 'Failed to clear wishlist');
+    },
+  });
+}

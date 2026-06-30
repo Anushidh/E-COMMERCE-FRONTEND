@@ -49,6 +49,7 @@ export const ENDPOINTS = {
     GET: '/wishlist',
     ADD: '/wishlist',
     REMOVE: (productId: string) => `/wishlist/${productId}`,
+    CLEAR: '/wishlist',
     MOVE_TO_CART: '/wishlist/move-to-cart',
   },
 
@@ -61,6 +62,7 @@ export const ENDPOINTS = {
     RETURN: (id: string) => `/orders/${id}/return`,
     INVOICE: (id: string) => `/orders/${id}/invoice`,
     VERIFY_PAYMENT: '/orders/verify-payment',
+    RETRY_PAYMENT: (id: string) => `/orders/${id}/retry-payment`,
   },
 
   // Coupons
@@ -97,6 +99,7 @@ export const ENDPOINTS = {
     ORDERS: '/admin/orders',
     ORDER_STATUS: (id: string) => `/admin/orders/${id}/status`,
     ORDER_RETURN: (id: string) => `/admin/orders/${id}/return`,
+    ORDER_CANCEL: (id: string) => `/admin/orders/${id}/cancel`,
     LOW_STOCK: '/admin/inventory/low-stock',
     ABANDONED_CARTS: '/admin/carts/abandoned',
     PROCESS_ABANDONED: '/admin/carts/abandoned/process',

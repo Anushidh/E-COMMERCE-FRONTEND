@@ -1,14 +1,34 @@
 import { Helmet } from 'react-helmet-async';
-import { Heart, ShoppingBag, Share2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { useWishlist, useRemoveFromWishlist } from '@/hooks/useWishlist';
-import { Button, Badge, Spinner } from '@shared/components';
+import { Heart, ShoppingBag, Share2, Trash2 } from 'lucide-react';
+import { useWishlist, useRemoveFromWishlist, useClearWishlist } from '@/hooks/useWishlist';
+import { Button, Badge, Skeleton } from '@shared/components';
 import { Link } from 'react-router';
 import styles from './Wishlist.module.css';
+
+function WishlistSkeleton() {
+  return (
+    <div className={styles.grid}>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className={styles.card}>
+          <Skeleton height="" className={styles.skeletonImage} />
+          <div className={styles.info}>
+            <Skeleton width="65%" height="0.875rem" />
+            <Skeleton width="30%" height="0.875rem" />
+          </div>
+          <div className={styles.actions}>
+            <Skeleton width="100%" height="2rem" borderRadius="var(--radius-sm)" />
+            <Skeleton width="100%" height="2rem" borderRadius="var(--radius-sm)" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function Wishlist() {
   const { data, isLoading } = useWishlist();
   const { mutate: remove } = useRemoveFromWishlist();
+  const { mutate: clearAll, isPending: clearing } = useClearWishlist();
 
   const products = data?.products || [];
 
@@ -33,16 +53,18 @@ export default function Wishlist() {
               <Button size="sm" variant="secondary" leftIcon={<Share2 size={14} />} onClick={shareWishlist}>
                 Share Wishlist
               </Button>
-              <Button size="sm" leftIcon={<ShoppingBag size={14} />} onClick={() => {
-                toast.success('Visit each product to select size & color before adding to bag');
+              <Button size="sm" variant="danger" leftIcon={<Trash2 size={14} />} loading={clearing} onClick={() => {
+                if (window.confirm('Are you sure you want to clear your entire wishlist?')) {
+                  clearAll();
+                }
               }}>
-                Move All to Bag
+                Delete All
               </Button>
             </div>
           )}
         </div>
 
-        {isLoading ? <Spinner size="lg" /> : products.length === 0 ? (
+        {isLoading ? <WishlistSkeleton /> : products.length === 0 ? (
           <div className={styles.empty}>
             <Heart size={48} strokeWidth={1} />
             <p>Your wishlist is empty</p>
@@ -58,7 +80,16 @@ export default function Wishlist() {
                 </Link>
                 <div className={styles.info}>
                   <Link to={`/shop/${product._id}`} className={styles.name}>{product.name}</Link>
-                  <span className={styles.price}>₹{product.basePrice.toLocaleString('en-IN')}</span>
+                  <div className={styles.priceRow}>
+                    {product.discountedPrice ? (
+                      <>
+                        <span className={styles.price}>₹{product.discountedPrice.toLocaleString('en-IN')}</span>
+                        <span className={styles.originalPrice}>₹{product.basePrice.toLocaleString('en-IN')}</span>
+                      </>
+                    ) : (
+                      <span className={styles.price}>₹{product.basePrice.toLocaleString('en-IN')}</span>
+                    )}
+                  </div>
                 </div>
                 <div className={styles.actions}>
                   <Link to={`/shop/${product._id}`}>

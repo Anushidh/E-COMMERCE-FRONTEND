@@ -8,6 +8,7 @@ export interface Product {
   gender: 'Men' | 'Women' | 'Unisex';
   images: string[];
   basePrice: number;
+  discountedPrice?: number | null;
   gstRate: number;
   status: 'Active' | 'Inactive' | 'Out of Stock';
   averageRating: number;

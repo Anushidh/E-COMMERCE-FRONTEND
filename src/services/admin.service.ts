@@ -144,6 +144,8 @@ export const adminService = {
     apiClient.patch(ENDPOINTS.ADMIN.ORDER_STATUS(id), { status }),
   handleReturn: (id: string, action: 'approve' | 'reject') =>
     apiClient.patch(ENDPOINTS.ADMIN.ORDER_RETURN(id), { action }),
+  handleCancellation: (id: string, action: 'approve' | 'reject') =>
+    apiClient.patch(ENDPOINTS.ADMIN.ORDER_CANCEL(id), { action }),
 
   // Coupons
   getCoupons: () =>
