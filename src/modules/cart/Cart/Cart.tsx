@@ -24,7 +24,7 @@ export default function Cart() {
   return (
     <>
       <Helmet>
-        <title>Bag — STORE</title>
+        <title>Bag — Wearhaus</title>
       </Helmet>
 
       <div className={styles.page}>

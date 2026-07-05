@@ -125,7 +125,7 @@ export default function Checkout() {
 
   return (
     <>
-      <Helmet><title>Checkout — STORE</title></Helmet>
+      <Helmet><title>Checkout — Wearhaus</title></Helmet>
       <div className={styles.page}>
         <h1 className={styles.title}>Checkout</h1>
 

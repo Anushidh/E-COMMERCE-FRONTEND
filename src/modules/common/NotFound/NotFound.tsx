@@ -6,7 +6,7 @@ import styles from './NotFound.module.css';
 export default function NotFound() {
   return (
     <>
-      <Helmet><title>Page Not Found — STORE</title></Helmet>
+      <Helmet><title>Page Not Found — Wearhaus</title></Helmet>
       <div className={styles.page}>
         <span className={styles.code}>404</span>
         <h1 className={styles.title}>Page not found</h1>

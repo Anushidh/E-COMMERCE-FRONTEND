@@ -33,7 +33,7 @@ export function Navbar() {
         </div>
 
         {/* Logo */}
-        <Link to="/" className={styles.logo}>STORE</Link>
+        <Link to="/" className={styles.logo}>Wearhaus</Link>
 
         {/* Right actions */}
         <div className={styles.rightNav}>

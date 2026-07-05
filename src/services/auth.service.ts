@@ -12,7 +12,7 @@ interface AuthUser {
 interface LoginResponse {
   user: AuthUser;
   accessToken: string;
-  refreshToken: string;
+  // refreshToken is set as HttpOnly cookie — never in response body
 }
 
 interface SignupPayload {
@@ -67,15 +67,16 @@ export const authService = {
   resendOTP: (data: ResendOTPPayload) =>
     apiClient.post<ApiResponse>(ENDPOINTS.AUTH.RESEND_OTP, data),
 
-  logout: (refreshToken: string | null) =>
-    apiClient.post(ENDPOINTS.AUTH.LOGOUT, { refreshToken }),
+  // Refresh token is in the HttpOnly cookie — backend reads it from there
+  logout: () =>
+    apiClient.post(ENDPOINTS.AUTH.LOGOUT),
 
   adminLogin: (data: LoginPayload) =>
-    apiClient.post<ApiResponse<{ admin: { id: string; name: string; email: string }; accessToken: string; refreshToken: string }>>(
+    apiClient.post<ApiResponse<{ admin: { id: string; name: string; email: string }; accessToken: string }>>(
       ENDPOINTS.ADMIN.LOGIN,
       data,
     ),
 
-  adminLogout: (refreshToken: string | null) =>
-    apiClient.post(ENDPOINTS.ADMIN.LOGOUT, { refreshToken }),
+  adminLogout: () =>
+    apiClient.post(ENDPOINTS.ADMIN.LOGOUT),
 };

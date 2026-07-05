@@ -62,7 +62,7 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.sidebarHeader}>
-          <div className={styles.brand}>STORE ADMIN</div>
+          <div className={styles.brand}>Wearhaus Admin</div>
           <button className={styles.closeSidebar} onClick={() => setSidebarOpen(false)} aria-label="Close menu">
             <X size={18} />
           </button>
@@ -107,7 +107,7 @@ export default function AdminLayout() {
           <button className={styles.menuBtn} onClick={() => setSidebarOpen(true)} aria-label="Open menu">
             <Menu size={20} />
           </button>
-          <span className={styles.headerBrand}>STORE ADMIN</span>
+          <span className={styles.headerBrand}>Wearhaus Admin</span>
         </header>
         <main className={styles.main}>
           <Outlet />

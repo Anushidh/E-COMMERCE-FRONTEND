@@ -12,7 +12,7 @@ export default function AuthLayout() {
       <div className={styles.brandPanel}>
         <div className={styles.brandPattern} />
         <div className={styles.brandContent}>
-          <a href="/" className={styles.brandLogo}>STORE</a>
+          <a href="/" className={styles.brandLogo}>Wearhaus</a>
           <div className={styles.brandMessage}>
             <h1 className={styles.brandHeadline}>
               Your style,<br />delivered.
@@ -27,14 +27,14 @@ export default function AuthLayout() {
               <li>New arrivals added every week</li>
             </ul>
           </div>
-          <p className={styles.brandFooter}>&copy; {new Date().getFullYear()} STORE. All rights reserved.</p>
+          <p className={styles.brandFooter}>&copy; {new Date().getFullYear()} Wearhaus. All rights reserved.</p>
         </div>
       </div>
 
       {/* Right form panel */}
       <div className={styles.formPanel}>
         <div className={styles.formContainer}>
-          <a href="/" className={styles.mobileLogo}>STORE</a>
+          <a href="/" className={styles.mobileLogo}>Wearhaus</a>
           <AnimatePresence mode="wait">
             <PageTransition key={location.pathname}>
               <Outlet />

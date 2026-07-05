@@ -10,11 +10,10 @@ interface User {
 interface AuthState {
   user: User | null;
   accessToken: string | null;
-  refreshToken: string | null;
   isAuthenticated: boolean;
   role: 'user' | 'admin' | null;
-  setAuth: (user: User, accessToken: string, refreshToken: string, role: 'user' | 'admin') => void;
-  setTokens: (accessToken: string, refreshToken: string) => void;
+  setAuth: (user: User, accessToken: string, role: 'user' | 'admin') => void;
+  setAccessToken: (accessToken: string) => void;
   logout: () => void;
 }
 
@@ -23,25 +22,24 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       accessToken: null,
-      refreshToken: null,
       isAuthenticated: false,
       role: null,
 
-      setAuth: (user, accessToken, refreshToken, role) =>
-        set({ user, accessToken, refreshToken, isAuthenticated: true, role }),
+      setAuth: (user, accessToken, role) =>
+        set({ user, accessToken, isAuthenticated: true, role }),
 
-      setTokens: (accessToken, refreshToken) =>
-        set({ accessToken, refreshToken }),
+      setAccessToken: (accessToken) =>
+        set({ accessToken }),
 
       logout: () =>
-        set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false, role: null }),
+        set({ user: null, accessToken: null, isAuthenticated: false, role: null }),
     }),
     {
       name: 'auth-storage',
+      // Only persist non-sensitive fields — refresh token stays in HttpOnly cookie only
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,
-        refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
         role: state.role,
       }),

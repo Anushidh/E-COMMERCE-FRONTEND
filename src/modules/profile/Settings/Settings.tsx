@@ -81,7 +81,7 @@ export default function Settings() {
 
   return (
     <>
-      <Helmet><title>Account Settings — STORE</title></Helmet>
+      <Helmet><title>Account Settings — Wearhaus</title></Helmet>
       <div className={styles.page}>
         <h1 className={styles.title}>Account Settings</h1>
 

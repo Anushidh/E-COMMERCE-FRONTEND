@@ -65,7 +65,7 @@ export default function ProductDetail() {
   return (
     <>
       <Helmet>
-        <title>{product.name} — STORE</title>
+        <title>{product.name} — Wearhaus</title>
         <meta name="description" content={product.description.slice(0, 160)} />
       </Helmet>
 

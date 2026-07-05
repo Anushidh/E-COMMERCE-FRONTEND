@@ -17,7 +17,7 @@ export default function Home() {
   return (
     <>
       <Helmet>
-        <title>STORE — Premium Fashion & Lifestyle</title>
+        <title>Wearhaus — Premium Fashion & Lifestyle</title>
         <meta name="description" content="Discover curated fashion collections. Minimal design, premium quality." />
       </Helmet>
 

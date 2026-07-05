@@ -63,7 +63,7 @@ export default function Signup() {
   return (
     <>
       <Helmet>
-        <title>Sign up — STORE</title>
+        <title>Sign up — Wearhaus</title>
       </Helmet>
       <div className={styles.card} ref={cardRef} onKeyDown={handleKeyDown}>
         {step === 'form' ? (

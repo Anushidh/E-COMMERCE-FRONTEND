@@ -46,7 +46,7 @@ export default function Addresses() {
 
   return (
     <>
-      <Helmet><title>Addresses — STORE</title></Helmet>
+      <Helmet><title>Addresses — Wearhaus</title></Helmet>
       <div className={styles.page}>
         <div className={styles.header}>
           <h1 className={styles.title}>My Addresses</h1>

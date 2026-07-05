@@ -5,7 +5,7 @@ import styles from './Info.module.css';
 export default function ShippingPolicy() {
   return (
     <>
-      <Helmet><title>Shipping Policy — STORE</title></Helmet>
+      <Helmet><title>Shipping Policy — Wearhaus</title></Helmet>
       <div className={styles.page}>
         <div className={styles.hero}>
           <h1 className={styles.title}>Shipping Policy</h1>
@@ -88,7 +88,7 @@ export default function ShippingPolicy() {
               </li>
               <li className={styles.listItem}>
                 <CheckCircle size={16} className={styles.listIcon} />
-                <span>If your order hasn't arrived within the expected timeline, reach out to us at support@store.com</span>
+                <span>If your order hasn't arrived within the expected timeline, reach out to us at support@wearhaus.com</span>
               </li>
             </ul>
           </div>

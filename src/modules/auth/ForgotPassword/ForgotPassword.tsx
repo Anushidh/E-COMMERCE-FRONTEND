@@ -55,7 +55,7 @@ export default function ForgotPassword() {
   return (
     <>
       <Helmet>
-        <title>Reset Password — STORE</title>
+        <title>Reset Password — Wearhaus</title>
       </Helmet>
       <div className={styles.card} ref={cardRef} onKeyDown={handleKeyDown}>
         <div className={styles.header}>

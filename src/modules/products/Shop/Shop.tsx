@@ -59,7 +59,7 @@ export default function Shop() {
   return (
     <>
       <Helmet>
-        <title>Shop — STORE</title>
+        <title>Shop — Wearhaus</title>
       </Helmet>
 
       <div className={styles.page}>

@@ -20,8 +20,9 @@ export function useLogin() {
   return useMutation({
     mutationFn: authService.login,
     onSuccess: (res) => {
-      const { user, accessToken, refreshToken } = res.data.data!;
-      setAuth({ id: user.id, name: user.name, email: user.email }, accessToken, refreshToken, 'user');
+      const { user, accessToken } = res.data.data!;
+      // Refresh token is in the HttpOnly cookie — not exposed in response body
+      setAuth({ id: user.id, name: user.name, email: user.email }, accessToken, 'user');
       toast.success('Welcome back!');
       navigate('/');
     },
@@ -50,8 +51,8 @@ export function useVerifyOTP() {
   return useMutation({
     mutationFn: authService.verifyOTP,
     onSuccess: (res) => {
-      const { user, accessToken, refreshToken } = res.data.data!;
-      setAuth({ id: user.id, name: user.name, email: user.email }, accessToken, refreshToken, 'user');
+      const { user, accessToken } = res.data.data!;
+      setAuth({ id: user.id, name: user.name, email: user.email }, accessToken, 'user');
       toast.success('Account created!');
       navigate('/');
     },
@@ -101,11 +102,12 @@ export function useResendOTP() {
 }
 
 export function useLogout() {
-  const { refreshToken, logout } = useAuthStore();
+  const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: () => authService.logout(refreshToken),
+    // No body needed — backend reads refresh token from the HttpOnly cookie
+    mutationFn: () => authService.logout(),
     onSettled: () => {
       logout();
       navigate('/login');
@@ -120,8 +122,8 @@ export function useAdminLogin() {
   return useMutation({
     mutationFn: authService.adminLogin,
     onSuccess: (res) => {
-      const { admin, accessToken, refreshToken } = res.data.data!;
-      setAuth({ id: admin.id, name: admin.name, email: admin.email }, accessToken, refreshToken, 'admin');
+      const { admin, accessToken } = res.data.data!;
+      setAuth({ id: admin.id, name: admin.name, email: admin.email }, accessToken, 'admin');
       toast.success('Welcome, Admin');
       navigate('/admin');
     },
@@ -132,11 +134,11 @@ export function useAdminLogin() {
 }
 
 export function useAdminLogout() {
-  const { refreshToken, logout } = useAuthStore();
+  const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: () => authService.adminLogout(refreshToken),
+    mutationFn: () => authService.adminLogout(),
     onSettled: () => {
       logout();
       navigate('/admin/login');

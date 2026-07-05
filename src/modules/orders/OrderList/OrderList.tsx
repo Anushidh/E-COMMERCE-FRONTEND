@@ -35,7 +35,7 @@ export default function OrderList() {
 
   return (
     <>
-      <Helmet><title>Orders — STORE</title></Helmet>
+      <Helmet><title>Orders — Wearhaus</title></Helmet>
       <div className={styles.page}>
         <h1 className={styles.title}>Your Orders</h1>
 

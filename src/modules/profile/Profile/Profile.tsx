@@ -74,7 +74,7 @@ export default function Profile() {
 
   return (
     <>
-      <Helmet><title>Profile — STORE</title></Helmet>
+      <Helmet><title>Profile — Wearhaus</title></Helmet>
       <div className={styles.page}>
         {/* Profile Header */}
         <div className={styles.header}>

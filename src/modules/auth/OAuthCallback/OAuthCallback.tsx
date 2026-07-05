@@ -1,13 +1,16 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { useAuthStore } from '@shared/stores/authStore';
+import { apiClient } from '@shared/api/client';
+import { ENDPOINTS } from '@shared/api/endpoints';
 import { Spinner } from '@shared/components';
 import { toast } from 'sonner';
 
 /**
  * Handles the OAuth redirect from the backend.
- * Extracts accessToken and refreshToken from URL params,
- * stores them, and redirects to home.
+ * The backend sends only the access token in the URL — the refresh token
+ * is set as an HttpOnly cookie and never exposed in the URL.
+ * Fetches the user profile to populate the auth store with real user data.
  */
 export default function OAuthCallback() {
   const [searchParams] = useSearchParams();
@@ -16,23 +19,32 @@ export default function OAuthCallback() {
 
   useEffect(() => {
     const accessToken = searchParams.get('accessToken');
-    const refreshToken = searchParams.get('refreshToken');
 
-    if (accessToken && refreshToken) {
-      // We don't have user info from the URL — the token is enough.
-      // We'll fetch profile on next navigation. Set minimal auth state.
-      setAuth(
-        { id: '', name: '', email: '' },
-        accessToken,
-        refreshToken,
-        'user',
-      );
-      toast.success('Logged in with Google');
-      navigate('/', { replace: true });
-    } else {
+    if (!accessToken) {
       toast.error('Authentication failed');
       navigate('/login', { replace: true });
+      return;
     }
+
+    // Fetch profile using the access token to get real user data
+    apiClient
+      .get(ENDPOINTS.USER.PROFILE, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      .then((res) => {
+        const user = res.data?.data;
+        setAuth(
+          { id: user._id, name: user.name, email: user.email },
+          accessToken,
+          'user',
+        );
+        toast.success('Logged in with Google');
+        navigate('/', { replace: true });
+      })
+      .catch(() => {
+        toast.error('Authentication failed');
+        navigate('/login', { replace: true });
+      });
   }, [searchParams, navigate, setAuth]);
 
   return (

@@ -38,7 +38,7 @@ export default function Login() {
   return (
     <>
       <Helmet>
-        <title>Login — STORE</title>
+        <title>Login — Wearhaus</title>
       </Helmet>
       <div className={styles.card} ref={cardRef} onKeyDown={handleKeyDown}>
         <div className={styles.header}>

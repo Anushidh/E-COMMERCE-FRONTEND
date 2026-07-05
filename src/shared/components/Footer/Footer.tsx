@@ -8,7 +8,7 @@ export function Footer() {
         <div className={styles.grid}>
           {/* Brand */}
           <div className={styles.brand}>
-            <Link to="/" className={styles.logo}>STORE</Link>
+            <Link to="/" className={styles.logo}>Wearhaus</Link>
             <p className={styles.tagline}>Premium fashion & lifestyle. Curated with intention.</p>
           </div>
 
@@ -40,7 +40,7 @@ export function Footer() {
         </div>
 
         <div className={styles.bottom}>
-          <p className={styles.copyright}>&copy; {new Date().getFullYear()} STORE. All rights reserved.</p>
+          <p className={styles.copyright}>&copy; {new Date().getFullYear()} Wearhaus. All rights reserved.</p>
         </div>
       </div>
     </footer>

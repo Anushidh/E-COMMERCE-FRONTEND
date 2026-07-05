@@ -63,7 +63,7 @@ export default function AdminLogin() {
   return (
     <>
       <Helmet>
-        <title>Admin Login — STORE</title>
+        <title>Admin Login — Wearhaus</title>
       </Helmet>
       <div className={styles.wrapper}>
         <div className={styles.card}>
@@ -76,7 +76,7 @@ export default function AdminLogin() {
             <Input
               label="Email"
               type="email"
-              placeholder="admin@store.com"
+              placeholder="admin@wearhaus.com"
               autoComplete="email"
               autoFocus
               error={errors.email?.message}

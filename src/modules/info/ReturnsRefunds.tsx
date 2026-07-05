@@ -5,7 +5,7 @@ import styles from './Info.module.css';
 export default function ReturnsRefunds() {
   return (
     <>
-      <Helmet><title>Returns & Refunds — STORE</title></Helmet>
+      <Helmet><title>Returns & Refunds — Wearhaus</title></Helmet>
       <div className={styles.page}>
         <div className={styles.hero}>
           <h1 className={styles.title}>Returns & Refunds</h1>
@@ -100,7 +100,7 @@ export default function ReturnsRefunds() {
               </li>
               <li className={styles.listItem}>
                 <AlertCircle size={16} className={styles.listIcon} />
-                <span>Amount is credited back to your original payment method or STORE Wallet (your choice)</span>
+                <span>Amount is credited back to your original payment method or Wearhaus Wallet (your choice)</span>
               </li>
               <li className={styles.listItem}>
                 <AlertCircle size={16} className={styles.listIcon} />
@@ -112,7 +112,7 @@ export default function ReturnsRefunds() {
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>Need Help?</h2>
             <p className={styles.text}>
-              If you have any questions about returns or refunds, reach out to us at <strong>support@store.com</strong> or call <strong>+91 98765 43210</strong>. We're happy to help.
+              If you have any questions about returns or refunds, reach out to us at <strong>support@wearhaus.com</strong> or call <strong>+91 98765 43210</strong>. We're happy to help.
             </p>
           </div>
         </div>

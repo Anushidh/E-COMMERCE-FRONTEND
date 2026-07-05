@@ -27,7 +27,7 @@ export default function OrderDetail() {
 
   return (
     <>
-      <Helmet><title>Order {order.orderId} — STORE</title></Helmet>
+      <Helmet><title>Order {order.orderId} — Wearhaus</title></Helmet>
       <div className={styles.page}>
         <div className={styles.header}>
           <div>

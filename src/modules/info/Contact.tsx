@@ -6,7 +6,7 @@ import styles from './Info.module.css';
 export default function Contact() {
   return (
     <>
-      <Helmet><title>Contact Us — STORE</title></Helmet>
+      <Helmet><title>Contact Us — Wearhaus</title></Helmet>
       <div className={styles.page}>
         <div className={styles.hero}>
           <h1 className={styles.title}>Get in Touch</h1>
@@ -22,7 +22,7 @@ export default function Contact() {
               <div className={styles.contactItemIcon}><Mail size={16} /></div>
               <div className={styles.contactItemText}>
                 <span className={styles.contactItemLabel}>Email</span>
-                <span className={styles.contactItemValue}>support@store.com</span>
+                <span className={styles.contactItemValue}>support@wearhaus.com</span>
               </div>
             </div>
             <div className={styles.contactItem}>

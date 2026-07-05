@@ -18,7 +18,7 @@ export default function Referrals() {
 
   return (
     <>
-      <Helmet><title>Referrals — STORE</title></Helmet>
+      <Helmet><title>Referrals — Wearhaus</title></Helmet>
       <div className={styles.page}>
         <div className={styles.codeCard}>
           <Gift size={24} />
@@ -35,7 +35,7 @@ export default function Referrals() {
               </Button>
               <Button size="sm" variant="secondary" leftIcon={<Share2 size={14} />} onClick={() => {
                 const signupUrl = `${window.location.origin}/signup?ref=${data.referralCode}`;
-                const message = `Hey! Use my referral code *${data.referralCode}* to sign up on STORE and get exciting offers!\n\n${signupUrl}`;
+                const message = `Hey! Use my referral code *${data.referralCode}* to sign up on Wearhaus and get exciting offers!\n\n${signupUrl}`;
                 window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
               }}>
                 Share on WhatsApp

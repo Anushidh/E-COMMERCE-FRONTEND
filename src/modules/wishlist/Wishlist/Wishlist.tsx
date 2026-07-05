@@ -34,13 +34,13 @@ export default function Wishlist() {
 
   const shareWishlist = () => {
     const names = products.slice(0, 5).map((p) => p.name).join(', ');
-    const message = `Check out my wishlist on STORE: ${names}${products.length > 5 ? ` and ${products.length - 5} more` : ''}!\n\n${window.location.origin}/shop`;
+    const message = `Check out my wishlist on Wearhaus: ${names}${products.length > 5 ? ` and ${products.length - 5} more` : ''}!\n\n${window.location.origin}/shop`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (
     <>
-      <Helmet><title>Wishlist — STORE</title></Helmet>
+      <Helmet><title>Wishlist — Wearhaus</title></Helmet>
       <div className={styles.page}>
         {/* Header */}
         <div className={styles.header}>

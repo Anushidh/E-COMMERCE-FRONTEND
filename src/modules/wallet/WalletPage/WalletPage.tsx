@@ -39,7 +39,7 @@ export default function WalletPage() {
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
         order_id: razorpayOrder.id,
-        name: 'STORE',
+        name: 'Wearhaus',
         description: 'Wallet Top-up',
         handler: async (response: any) => {
           try {
@@ -76,7 +76,7 @@ export default function WalletPage() {
 
   return (
     <>
-      <Helmet><title>Wallet — STORE</title></Helmet>
+      <Helmet><title>Wallet — Wearhaus</title></Helmet>
       <div className={styles.page}>
         {/* Balance Card */}
         <div className={styles.balance}>
