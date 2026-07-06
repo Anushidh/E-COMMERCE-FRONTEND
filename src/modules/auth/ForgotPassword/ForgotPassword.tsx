@@ -76,7 +76,6 @@ export default function ForgotPassword() {
               type="email"
               placeholder="you@example.com"
               autoComplete="email"
-              autoFocus
               error={emailForm.formState.errors.email?.message}
               {...emailForm.register('email')}
             />
@@ -94,7 +93,6 @@ export default function ForgotPassword() {
               placeholder="000000"
               maxLength={6}
               autoComplete="off"
-              autoFocus
               error={resetForm.formState.errors.otp?.message}
               {...resetForm.register('otp')}
             />

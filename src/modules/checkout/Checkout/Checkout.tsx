@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router';
-import { MapPin, Tag, Wallet, CreditCard, Truck } from 'lucide-react';
-import { Button, Badge, Input } from '@shared/components';
+import { MapPin, Tag, Wallet, CreditCard, Truck, Plus } from 'lucide-react';
+import { Button, Badge, Input, AddressFormModal } from '@shared/components';
 import { useCart } from '@/hooks/useCart';
 import { useProfile } from '@/hooks/useUser';
 import { useAvailableCoupons, useApplyCoupon } from '@/hooks/useCoupons';
@@ -24,6 +24,15 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'cod' | 'wallet'>('razorpay');
   const [couponCode, setCouponCode] = useState('');
   const [useWalletBalance, setUseWalletBalance] = useState(false);
+  const [showAddAddress, setShowAddAddress] = useState(false);
+
+  // Set default address when profile loads
+  useEffect(() => {
+    if (profile?.addresses && !selectedAddress) {
+      const defaultAddr = profile.addresses.find((a) => a.isDefault) || profile.addresses[0];
+      if (defaultAddr) setSelectedAddress(defaultAddr._id);
+    }
+  }, [profile?.addresses, selectedAddress]);
 
   if (cartLoading || profileLoading) {
     return (
@@ -47,11 +56,6 @@ export default function Checkout() {
   }
 
   const addresses = profile?.addresses || [];
-  const defaultAddr = addresses.find((a) => a.isDefault) || addresses[0];
-
-  if (!selectedAddress && defaultAddr) {
-    setSelectedAddress(defaultAddr._id);
-  }
 
   const subtotal = cart.totalAmount;
   const offerSavings = cart.items.reduce((sum, item) => {
@@ -69,7 +73,6 @@ export default function Checkout() {
     : useWalletBalance ? Math.min(walletBalance, afterOffers - discount + shipping) : 0;
   const total = Math.max(afterOffers - discount - walletDeduction + shipping, 0);
 
-  // If wallet covers the full amount via checkbox, auto-switch to wallet payment
   const effectivePaymentMethod = (useWalletBalance && total === 0 && paymentMethod !== 'wallet') ? 'wallet' : paymentMethod;
 
   const handleApplyCoupon = () => {
@@ -89,7 +92,6 @@ export default function Checkout() {
       onSuccess: (res) => {
         const data = res.data.data as any;
         if (data?.razorpayOrder) {
-          // Trigger Razorpay checkout
           const options = {
             key: import.meta.env.VITE_RAZORPAY_KEY_ID || '',
             amount: data.razorpayOrder.amount,
@@ -102,14 +104,11 @@ export default function Checkout() {
                   razorpay_payment_id: response.razorpay_payment_id,
                   razorpay_signature: response.razorpay_signature,
                 });
-              } catch {
-                // Even if verification fails, navigate to order page so user can retry
-              }
+              } catch {}
               navigate(`/orders/${data.order._id}`);
             },
             modal: {
               ondismiss: () => {
-                // User closed Razorpay modal without paying — navigate to order page where they can retry
                 navigate(`/orders/${data.order._id}`);
               },
             },
@@ -133,9 +132,13 @@ export default function Checkout() {
           <div className={styles.left}>
             {/* Address */}
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}><MapPin size={16} /> Delivery Address</h2>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}><MapPin size={16} /> Delivery Address</h2>
+                <Button size="sm" variant="secondary" leftIcon={<Plus size={14} />} onClick={() => setShowAddAddress(true)}>Add Address</Button>
+              </div>
+              
               {addresses.length === 0 ? (
-                <p className={styles.noAddress}>No addresses saved. <a href="/profile/addresses">Add one</a></p>
+                <p className={styles.noAddress}>No addresses saved.</p>
               ) : (
                 <div className={styles.addressList}>
                   {addresses.map((addr) => (
@@ -143,7 +146,7 @@ export default function Checkout() {
                       <input type="radio" name="address" value={addr._id} checked={selectedAddress === addr._id} onChange={() => setSelectedAddress(addr._id)} className="sr-only" />
                       <span className={styles.addressLabel}>{addr.label}</span>
                       <span className={styles.addressText}>{addr.fullName}, {addr.addressLine1}, {addr.city}, {addr.state} — {addr.pincode}</span>
-                      {addr.isDefault && <Badge variant="default">Default</Badge>}
+                      {addr.isDefault && <Badge variant="success">Default</Badge>}
                     </label>
                   ))}
                 </div>
@@ -152,7 +155,7 @@ export default function Checkout() {
 
             {/* Coupon */}
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}><Tag size={16} /> Coupon</h2>
+              <h2 className={styles.sectionTitle} style={{ marginBottom: 'var(--space-4)' }}><Tag size={16} /> Coupon</h2>
               <div className={styles.couponRow}>
                 <Input placeholder="Enter code" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} />
                 <Button variant="secondary" size="sm" onClick={handleApplyCoupon}>Apply</Button>
@@ -171,10 +174,10 @@ export default function Checkout() {
               )}
             </section>
 
-            {/* Wallet (partial usage — only show when not paying fully with wallet) */}
+            {/* Wallet */}
             {wallet && wallet.balance > 0 && paymentMethod !== 'wallet' && (
               <section className={styles.section}>
-                <h2 className={styles.sectionTitle}><Wallet size={16} /> Wallet</h2>
+                <h2 className={styles.sectionTitle} style={{ marginBottom: 'var(--space-4)' }}><Wallet size={16} /> Wallet</h2>
                 <label className={styles.walletToggle}>
                   <input type="checkbox" checked={useWalletBalance} onChange={(e) => setUseWalletBalance(e.target.checked)} />
                   <span>Use wallet balance (₹{wallet.balance.toLocaleString('en-IN')})</span>
@@ -184,7 +187,7 @@ export default function Checkout() {
 
             {/* Payment */}
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}><CreditCard size={16} /> Payment Method</h2>
+              <h2 className={styles.sectionTitle} style={{ marginBottom: 'var(--space-4)' }}><CreditCard size={16} /> Payment Method</h2>
               {useWalletBalance && total === 0 ? (
                 <p className={styles.walletCovers}>Wallet balance covers the full amount. No additional payment needed.</p>
               ) : (
@@ -237,6 +240,15 @@ export default function Checkout() {
           </aside>
         </div>
       </div>
+
+      <AddressFormModal 
+        open={showAddAddress} 
+        onClose={() => setShowAddAddress(false)} 
+        onSuccess={() => {
+          // If it's their first address, it will automatically become default and selected
+          // via the useEffect above when the profile data refreshes.
+        }}
+      />
     </>
   );
 }

@@ -5,42 +5,12 @@ export function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={styles.inner}>
-        <div className={styles.grid}>
-          {/* Brand */}
-          <div className={styles.brand}>
-            <Link to="/" className={styles.logo}>Wearhaus</Link>
-            <p className={styles.tagline}>Premium fashion & lifestyle. Curated with intention.</p>
-          </div>
-
-          {/* Shop */}
-          <div className={styles.column}>
-            <h4 className={styles.columnTitle}>Shop</h4>
-            <Link to="/shop?gender=Women" className={styles.link}>Women</Link>
-            <Link to="/shop?gender=Men" className={styles.link}>Men</Link>
-            <Link to="/shop" className={styles.link}>All Products</Link>
-          </div>
-
-          {/* Account */}
-          <div className={styles.column}>
-            <h4 className={styles.columnTitle}>Account</h4>
-            <Link to="/profile" className={styles.link}>My Profile</Link>
-            <Link to="/orders" className={styles.link}>Orders</Link>
-            <Link to="/wishlist" className={styles.link}>Wishlist</Link>
-            <Link to="/wallet" className={styles.link}>Wallet</Link>
-          </div>
-
-          {/* Info */}
-          <div className={styles.column}>
-            <h4 className={styles.columnTitle}>Info</h4>
-            <Link to="/about" className={styles.link}>About Us</Link>
-            <Link to="/contact" className={styles.link}>Contact</Link>
-            <Link to="/shipping-policy" className={styles.link}>Shipping Policy</Link>
-            <Link to="/returns-refunds" className={styles.link}>Returns & Refunds</Link>
-          </div>
-        </div>
-
-        <div className={styles.bottom}>
-          <p className={styles.copyright}>&copy; {new Date().getFullYear()} Wearhaus. All rights reserved.</p>
+        <p className={styles.copyright}>&copy; {new Date().getFullYear()} Wearhaus. All rights reserved.</p>
+        <div className={styles.links}>
+          <Link to="/about" className={styles.link}>About Us</Link>
+          <Link to="/contact" className={styles.link}>Contact</Link>
+          <Link to="/shipping-policy" className={styles.link}>Shipping Policy</Link>
+          <Link to="/returns-refunds" className={styles.link}>Returns & Refunds</Link>
         </div>
       </div>
     </footer>

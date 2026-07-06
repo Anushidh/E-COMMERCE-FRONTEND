@@ -16,8 +16,8 @@
   border-radius: var(--radius-lg);
   padding: var(--space-8);
   max-height: 90vh;
-  overflow-y: visible;
-  overflow-x: visible;
+  overflow-y: auto;
+  overflow-x: hidden;
   animation: scaleIn var(--duration-slow) var(--ease-out);
 }
 

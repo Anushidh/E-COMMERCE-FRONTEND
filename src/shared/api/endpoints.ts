@@ -104,4 +104,9 @@ export const ENDPOINTS = {
     ABANDONED_CARTS: '/admin/carts/abandoned',
     PROCESS_ABANDONED: '/admin/carts/abandoned/process',
   },
+
+  // Offers
+  OFFERS: {
+    ACTIVE: '/offers/active',
+  },
 } as const;

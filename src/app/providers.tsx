@@ -27,7 +27,7 @@ export function Providers({ children }: ProvidersProps) {
           <ScrollToTop />
           {children}
           <Toaster
-            position="bottom-right"
+            position="top-right"
             closeButton
             toastOptions={{
               style: {

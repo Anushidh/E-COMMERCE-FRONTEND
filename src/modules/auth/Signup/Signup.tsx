@@ -95,7 +95,6 @@ export default function Signup() {
                   label="Full name"
                   placeholder="John Doe"
                   autoComplete="name"
-                  autoFocus
                   error={signupForm.formState.errors.name?.message}
                   {...signupForm.register('name')}
                 />

@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Heart, ShoppingBag, Share2, Trash2 } from 'lucide-react';
 import { useWishlist, useRemoveFromWishlist, useClearWishlist } from '@/hooks/useWishlist';
-import { Button, Badge, Skeleton } from '@shared/components';
+import { Button, Badge, Skeleton, ConfirmDialog } from '@shared/components';
 import { Link } from 'react-router';
 import styles from './Wishlist.module.css';
 
@@ -30,12 +31,26 @@ export default function Wishlist() {
   const { mutate: remove } = useRemoveFromWishlist();
   const { mutate: clearAll, isPending: clearing } = useClearWishlist();
 
+  const [confirmDialog, setConfirmDialog] = useState<{ open: boolean; type: 'single' | 'all'; productId?: string }>({
+    open: false,
+    type: 'all',
+  });
+
   const products = data?.products || [];
 
   const shareWishlist = () => {
     const names = products.slice(0, 5).map((p) => p.name).join(', ');
     const message = `Check out my wishlist on Wearhaus: ${names}${products.length > 5 ? ` and ${products.length - 5} more` : ''}!\n\n${window.location.origin}/shop`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
+  const handleConfirm = () => {
+    if (confirmDialog.type === 'all') {
+      clearAll();
+    } else if (confirmDialog.type === 'single' && confirmDialog.productId) {
+      remove(confirmDialog.productId);
+    }
+    setConfirmDialog({ ...confirmDialog, open: false });
   };
 
   return (
@@ -46,18 +61,13 @@ export default function Wishlist() {
         <div className={styles.header}>
           <div className={styles.headerLeft}>
             <h1 className={styles.title}>Wishlist <Heart size={20} /></h1>
-            {products.length > 0 && <span className={styles.itemCount}>{products.length} item{products.length !== 1 ? 's' : ''}</span>}
           </div>
           {products.length > 0 && (
             <div className={styles.headerActions}>
               <Button size="sm" variant="secondary" leftIcon={<Share2 size={14} />} onClick={shareWishlist}>
                 Share Wishlist
               </Button>
-              <Button size="sm" variant="danger" leftIcon={<Trash2 size={14} />} loading={clearing} onClick={() => {
-                if (window.confirm('Are you sure you want to clear your entire wishlist?')) {
-                  clearAll();
-                }
-              }}>
+              <Button size="sm" variant="danger" leftIcon={<Trash2 size={14} />} loading={clearing} onClick={() => setConfirmDialog({ open: true, type: 'all' })}>
                 Delete All
               </Button>
             </div>
@@ -97,7 +107,7 @@ export default function Wishlist() {
                       {product.inStock ? 'Select Variant' : 'Unavailable'}
                     </Button>
                   </Link>
-                  <Button size="sm" variant="danger" onClick={() => remove(product._id)}>
+                  <Button size="sm" variant="danger" onClick={() => setConfirmDialog({ open: true, type: 'single', productId: product._id })}>
                     Delete
                   </Button>
                 </div>
@@ -106,6 +116,15 @@ export default function Wishlist() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={confirmDialog.open}
+        title={confirmDialog.type === 'all' ? 'Clear Wishlist?' : 'Remove Item?'}
+        description={confirmDialog.type === 'all' ? 'Are you sure you want to remove all items from your wishlist? This cannot be undone.' : 'Are you sure you want to remove this item from your wishlist?'}
+        confirmLabel={confirmDialog.type === 'all' ? 'Clear All' : 'Remove'}
+        onConfirm={handleConfirm}
+        onCancel={() => setConfirmDialog({ ...confirmDialog, open: false })}
+      />
     </>
   );
 }

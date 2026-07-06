@@ -3,6 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import { Navbar } from '@shared/components/Navbar';
 import { Footer } from '@shared/components/Footer';
 import { PageTransition } from '@shared/components/PageTransition';
+import { OfferBanner } from '@shared/components/OfferBanner';
 import styles from './PublicLayout.module.css';
 
 export default function PublicLayout() {
@@ -10,6 +11,7 @@ export default function PublicLayout() {
 
   return (
     <div className={styles.layout}>
+      {location.pathname === '/' && <OfferBanner />}
       <Navbar />
       <main className={styles.main}>
         <AnimatePresence mode="wait">

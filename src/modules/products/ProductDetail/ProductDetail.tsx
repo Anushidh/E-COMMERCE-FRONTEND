@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { Helmet } from 'react-helmet-async';
 import { Heart, Minus, Plus, ShoppingBag } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button, Badge, Skeleton } from '@shared/components';
 import { useProductDetail } from '@/hooks/useProducts';
 import { useAddToCart } from '@/hooks/useCart';
@@ -119,7 +120,14 @@ export default function ProductDetail() {
                   <span className={styles.qtyValue}>{quantity}</span>
                   <button
                     className={styles.qtyBtn}
-                    onClick={() => setQuantity(Math.min(10, quantity + 1))}
+                    onClick={() => {
+                      const maxQty = Math.min(10, selectedVariant.stock);
+                      if (quantity >= maxQty) {
+                        toast(`Maximum quantity reached for this item`);
+                      } else {
+                        setQuantity(quantity + 1);
+                      }
+                    }}
                     aria-label="Increase quantity"
                   >
                     <Plus size={14} />

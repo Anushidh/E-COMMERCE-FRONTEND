@@ -6,7 +6,8 @@
 @media (min-width: 1024px) { .layout { grid-template-columns: 1fr 380px; gap: var(--space-12); } }
 .left { display: flex; flex-direction: column; gap: var(--space-6); }
 .section { padding: var(--space-6); border: 1px solid var(--border-secondary); border-radius: var(--radius-md); }
-.sectionTitle { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); font-weight: var(--weight-semibold); text-transform: uppercase; letter-spacing: var(--tracking-wider); margin-bottom: var(--space-4); }
+.sectionTitle { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); font-weight: var(--weight-semibold); text-transform: uppercase; letter-spacing: var(--tracking-wider); }
+.sectionHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
 .noAddress { font-size: var(--text-sm); color: var(--text-secondary); }
 .noAddress a { text-decoration: underline; }
 .addressList { display: flex; flex-direction: column; gap: var(--space-3); }
