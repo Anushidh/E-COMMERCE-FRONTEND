@@ -25,14 +25,14 @@ export default function AdminOrderDetail() {
 
   const { data: order, isLoading } = useQuery({
     queryKey: ['admin', 'order', id],
-    queryFn: () => apiClient.get<ApiResponse<Order>>(`/orders/${id}`),
+    queryFn: () => apiClient.get<ApiResponse<Order>>(`/admin/orders/${id}`),
     select: (res) => res.data.data,
     enabled: !!id,
   });
 
   const { data: invoice } = useQuery({
     queryKey: ['admin', 'order', id, 'invoice'],
-    queryFn: () => apiClient.get<ApiResponse<{ invoiceId: string; pdfUrl: string }>>(`/orders/${id}/invoice`),
+    queryFn: () => apiClient.get<ApiResponse<{ invoiceId: string; pdfUrl: string }>>(`/admin/orders/${id}/invoice`),
     select: (res) => res.data.data,
     enabled: !!id && !!order && !['Cancelled', 'Returned'].includes(order.orderStatus),
   });
