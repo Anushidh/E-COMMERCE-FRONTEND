@@ -16,11 +16,11 @@
 .addressActive { border-color: var(--text-primary); background-color: var(--bg-secondary); }
 .addressLabel { font-size: var(--text-xs); font-weight: var(--weight-semibold); text-transform: uppercase; letter-spacing: var(--tracking-wider); color: var(--text-secondary); }
 .addressText { font-size: var(--text-sm); color: var(--text-primary); }
-.couponRow { display: flex; gap: var(--space-2); align-items: flex-end; }
+.couponRow { display: flex; gap: var(--space-2); align-items: stretch; margin-top: var(--space-2); }
 .couponSuccess { font-size: var(--text-xs); color: var(--color-success); margin-top: var(--space-2); font-weight: var(--weight-medium); }
 .couponList { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
-.couponChip { padding: var(--space-1) var(--space-3); font-size: var(--text-xs); border: 1px dashed var(--border-primary); border-radius: var(--radius-full); color: var(--text-secondary); cursor: pointer; transition: var(--transition-colors); }
-.couponChip:hover { border-color: var(--text-primary); color: var(--text-primary); }
+.couponChip { padding: var(--space-1) var(--space-3); font-size: var(--text-xs); font-weight: var(--weight-semibold); border: 1px dashed #A7F3D0; border-radius: var(--radius-sm); color: #065F46; background-color: #ECFDF5; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.couponChip:hover { background-color: #D1FAE5; border-color: #059669; transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
 .walletToggle { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-sm); cursor: pointer; }
 .walletToggle input { width: 1rem; height: 1rem; }
 .paymentOptions { display: flex; flex-direction: column; gap: var(--space-3); }

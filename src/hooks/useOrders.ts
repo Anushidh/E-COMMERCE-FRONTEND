@@ -96,6 +96,7 @@ export function useRequestReturn() {
     mutationFn: ({ id, reason }: { id: string; reason: string }) => ordersService.requestReturn(id, reason),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['orders'] });
+      qc.invalidateQueries({ queryKey: ['order'] });
       toast.success('Return request submitted');
     },
     onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),

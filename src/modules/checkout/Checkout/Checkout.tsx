@@ -16,7 +16,7 @@ export default function Checkout() {
   const { data: profile, isLoading: profileLoading } = useProfile();
   const { data: wallet } = useWallet();
   const { data: coupons } = useAvailableCoupons();
-  const { mutate: applyCoupon, data: couponResult } = useApplyCoupon();
+  const { mutate: applyCoupon, data: couponResult, reset: resetCoupon } = useApplyCoupon();
   const { mutate: placeOrder, isPending: placing } = usePlaceOrder();
   const { mutateAsync: verifyPaymentAsync } = useVerifyPayment();
 
@@ -157,15 +157,21 @@ export default function Checkout() {
             <section className={styles.section}>
               <h2 className={styles.sectionTitle} style={{ marginBottom: 'var(--space-4)' }}><Tag size={16} /> Coupon</h2>
               <div className={styles.couponRow}>
-                <Input placeholder="Enter code" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} />
-                <Button variant="secondary" size="sm" onClick={handleApplyCoupon}>Apply</Button>
+                <div style={{ maxWidth: '250px', flex: 1 }}>
+                  <Input placeholder="Enter code" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} disabled={!!couponResult?.data.data} />
+                </div>
+                {couponResult?.data.data ? (
+                  <Button variant="secondary" onClick={() => { resetCoupon(); setCouponCode(''); }}>Remove</Button>
+                ) : (
+                  <Button onClick={handleApplyCoupon}>Apply</Button>
+                )}
               </div>
               {couponResult?.data.data && (
                 <p className={styles.couponSuccess}>-₹{couponResult.data.data.discount.toFixed(2)} applied!</p>
               )}
               {coupons && coupons.length > 0 && (
                 <div className={styles.couponList}>
-                  {coupons.slice(0, 3).map((c) => (
+                  {coupons.map((c) => (
                     <button key={c._id} className={styles.couponChip} onClick={() => setCouponCode(c.code)}>
                       {c.code} — {c.discountType === 'percentage' ? `${c.discountValue}%` : `₹${c.discountValue}`} off
                     </button>
@@ -234,7 +240,12 @@ export default function Checkout() {
               <span>Total</span>
               <span>₹{total.toFixed(2)}</span>
             </div>
-            <Button size="lg" fullWidth loading={placing} disabled={!selectedAddress || (paymentMethod === 'cod' && total < 500) || (paymentMethod === 'wallet' && walletBalance < (subtotal - discount + shipping))} onClick={handlePlaceOrder}>
+            {total < 50 && effectivePaymentMethod !== 'wallet' && (
+              <p className={styles.codWarning} style={{ color: 'var(--color-error)', fontSize: '0.875rem', marginTop: '0', marginBottom: 'var(--space-4)' }}>
+                Minimum payable amount is ₹50
+              </p>
+            )}
+            <Button size="lg" fullWidth loading={placing} disabled={!selectedAddress || (paymentMethod === 'cod' && total < 500) || (paymentMethod === 'wallet' && walletBalance < (subtotal - discount + shipping)) || (total < 50 && effectivePaymentMethod !== 'wallet')} onClick={handlePlaceOrder}>
               Place Order
             </Button>
           </aside>

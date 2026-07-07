@@ -100,6 +100,15 @@ export function useCreateCoupon() {
   });
 }
 
+export function useUpdateCoupon() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => adminService.updateCoupon(id, data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'coupons'] }); toast.success('Coupon updated'); },
+    onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
+  });
+}
+
 export function useDeleteCoupon() {
   const qc = useQueryClient();
   return useMutation({
@@ -137,6 +146,15 @@ export function useDeleteProductOffer() {
   });
 }
 
+export function useUpdateProductOffer() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => adminService.updateProductOffer(id, data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'productOffers'] }); toast.success('Offer updated'); },
+    onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
+  });
+}
+
 export function useCategoryOffers() {
   return useQuery({
     queryKey: ['admin', 'categoryOffers'],
@@ -159,6 +177,15 @@ export function useDeleteCategoryOffer() {
   return useMutation({
     mutationFn: adminService.deleteCategoryOffer,
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'categoryOffers'] }); toast.success('Offer deleted'); },
+    onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
+  });
+}
+
+export function useUpdateCategoryOffer() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => adminService.updateCategoryOffer(id, data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'categoryOffers'] }); toast.success('Offer updated'); },
     onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
   });
 }

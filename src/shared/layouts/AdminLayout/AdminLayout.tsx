@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, NavLink, Navigate, useLocation } from 'react-router';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '@shared/stores/authStore';
@@ -133,6 +133,11 @@ export default function AdminLayout() {
 
 function NavGroup({ label, children, isActive, onNavigate }: { label: string; children: NavItem[]; isActive: boolean; onNavigate: () => void }) {
   const [expanded, setExpanded] = useState(isActive);
+  const location = useLocation();
+
+  useEffect(() => {
+    setExpanded(isActive);
+  }, [location.pathname, isActive]);
 
   return (
     <div className={styles.navGroup}>

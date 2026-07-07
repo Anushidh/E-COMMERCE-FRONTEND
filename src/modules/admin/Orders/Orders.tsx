@@ -79,8 +79,14 @@ export default function Orders() {
                   ))}
                   {order.orderStatus === 'Return Requested' && (
                     <>
-                      <Button size="sm" onClick={() => handleReturn({ id: order._id, action: 'approve' })}>Approve</Button>
-                      <Button size="sm" variant="ghost" onClick={() => handleReturn({ id: order._id, action: 'reject' })}>Reject</Button>
+                      <Button size="sm" loading={updatingId === `${order._id}-approve`} onClick={() => {
+                        setUpdatingId(`${order._id}-approve`);
+                        handleReturn({ id: order._id, action: 'approve' }, { onSettled: () => setUpdatingId(null) });
+                      }}>Approve</Button>
+                      <Button size="sm" variant="ghost" loading={updatingId === `${order._id}-reject`} onClick={() => {
+                        setUpdatingId(`${order._id}-reject`);
+                        handleReturn({ id: order._id, action: 'reject' }, { onSettled: () => setUpdatingId(null) });
+                      }}>Reject</Button>
                     </>
                   )}
                 </div>

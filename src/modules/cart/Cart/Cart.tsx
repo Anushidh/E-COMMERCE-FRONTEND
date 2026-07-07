@@ -59,7 +59,16 @@ export default function Cart() {
             </div>
 
             {/* Summary */}
-            <CartSummary totalAmount={cart.totalAmount} itemCount={cart.items.length} />
+            <CartSummary 
+              totalAmount={cart.totalAmount} 
+              itemCount={cart.items.length} 
+              offerSavings={cart.items.reduce((sum, item) => {
+                if (item.discountedPrice) {
+                  return sum + (item.price - item.discountedPrice) * item.quantity;
+                }
+                return sum;
+              }, 0)}
+            />
           </div>
         )}
       </div>

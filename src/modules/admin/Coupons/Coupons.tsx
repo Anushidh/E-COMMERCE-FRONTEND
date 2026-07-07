@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Edit } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useAdminCoupons, useCreateCoupon, useDeleteCoupon } from '@/hooks/useAdmin';
+import { useAdminCoupons, useCreateCoupon, useDeleteCoupon, useUpdateCoupon } from '@/hooks/useAdmin';
 import { Button, Badge, TableSkeleton, Input, Modal, ConfirmDialog, DatePicker, Select } from '@shared/components';
 import { getOfferStatusBadgeVariant } from '@/shared/utils/badge';
 import styles from './Coupons.module.css';
@@ -17,33 +17,35 @@ const couponSchema = z.object({
   maxDiscount: z.coerce.number().min(0).optional(),
   usageLimitPerUser: z.coerce.number().int().min(1).optional(),
   totalUsageLimit: z.coerce.number().int().min(1),
-  expiryDate: z.string().min(1, 'Required'),
+  expiryDate: z.string().min(1, 'Required').refine((val) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return new Date(val) >= today;
+  }, { message: 'Expiry date cannot be in the past' }),
 });
 
 type CouponForm = z.infer<typeof couponSchema>;
 
 export default function Coupons() {
   const [showCreate, setShowCreate] = useState(false);
+  const [editTargetId, setEditTargetId] = useState<string | null>(null);
   const [confirmClose, setConfirmClose] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; code: string } | null>(null);
   const { data, isLoading } = useAdminCoupons();
   const { mutate: create, isPending: creating } = useCreateCoupon();
+  const { mutate: update, isPending: updating } = useUpdateCoupon();
   const { mutate: deleteCoupon } = useDeleteCoupon();
 
-  const { register, handleSubmit, reset, watch, control, formState: { errors } } = useForm<CouponForm>({
+  const { register, handleSubmit, reset, control, formState: { errors, isDirty } } = useForm<CouponForm>({
     resolver: zodResolver(couponSchema),
   });
 
-  // Check if any field has a value for create form
-  const couponValues = watch();
-  const isCouponDirty = !!(
-    couponValues.code || couponValues.discountValue || couponValues.totalUsageLimit ||
-    couponValues.expiryDate || couponValues.minOrderValue || couponValues.maxDiscount ||
-    couponValues.usageLimitPerUser
-  ) || (couponValues.discountType && couponValues.discountType !== 'percentage');
-
   const onSubmit = (data: CouponForm) => {
-    create(data, { onSuccess: () => { reset(); setShowCreate(false); } });
+    if (editTargetId) {
+      update({ id: editTargetId, data }, { onSuccess: () => { reset(); setShowCreate(false); setEditTargetId(null); } });
+    } else {
+      create(data, { onSuccess: () => { reset(); setShowCreate(false); } });
+    }
   };
 
   return (
@@ -70,7 +72,23 @@ export default function Coupons() {
                 <Badge variant={getOfferStatusBadgeVariant(c.isActive && new Date(c.expiryDate) > new Date())}>
                   {c.isActive && new Date(c.expiryDate) > new Date() ? 'Active' : 'Expired'}
                 </Badge>
-                <button className={styles.deleteBtn} onClick={() => setDeleteTarget({ id: c._id, code: c.code })} aria-label="Delete"><Trash2 size={14} /></button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button className={styles.deleteBtn} onClick={() => {
+                    setEditTargetId(c._id);
+                    reset({
+                      code: c.code,
+                      discountType: c.discountType as any,
+                      discountValue: c.discountValue,
+                      minOrderValue: c.minOrderValue,
+                      maxDiscount: c.maxDiscount,
+                      usageLimitPerUser: c.usageLimitPerUser,
+                      totalUsageLimit: c.totalUsageLimit,
+                      expiryDate: new Date(c.expiryDate).toISOString().split('T')[0],
+                    });
+                    setShowCreate(true);
+                  }} aria-label="Edit"><Edit size={14} /></button>
+                  <button className={styles.deleteBtn} onClick={() => setDeleteTarget({ id: c._id, code: c.code })} aria-label="Delete"><Trash2 size={14} /></button>
+                </div>
               </div>
             ))}
           </div>
@@ -78,8 +96,8 @@ export default function Coupons() {
       </div>
 
       <Modal open={showCreate} onClose={() => {
-        if (isCouponDirty) { setConfirmClose(true); } else { setShowCreate(false); reset(); }
-      }} title="Create Coupon" size="md">
+        if (isDirty) { setConfirmClose(true); } else { setShowCreate(false); setEditTargetId(null); reset(); }
+      }} title={editTargetId ? "Edit Coupon" : "Create Coupon"} size="md">
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <Input label="Code" placeholder="SAVE20" error={errors.code?.message} {...register('code')} />
           <div className={styles.row}>
@@ -99,7 +117,7 @@ export default function Coupons() {
           <Controller name="expiryDate" control={control} render={({ field }) => (
             <DatePicker label="Expiry Date" value={field.value} onChange={field.onChange} error={errors.expiryDate?.message} />
           )} />
-          <Button type="submit" fullWidth loading={creating}>Create Coupon</Button>
+          <Button type="submit" fullWidth loading={creating || updating}>{editTargetId ? 'Update Coupon' : 'Create Coupon'}</Button>
         </form>
       </Modal>
 
@@ -110,7 +128,7 @@ export default function Coupons() {
         confirmLabel="Discard"
         cancelLabel="Keep editing"
         variant="warning"
-        onConfirm={() => { setConfirmClose(false); reset(); setShowCreate(false); }}
+        onConfirm={() => { setConfirmClose(false); reset(); setEditTargetId(null); setShowCreate(false); }}
         onCancel={() => setConfirmClose(false)}
       />
 

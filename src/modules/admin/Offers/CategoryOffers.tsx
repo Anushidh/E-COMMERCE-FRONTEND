@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Plus, Trash2 } from 'lucide-react';
+import { Edit2, Plus, Trash2 } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useCategoryOffers, useCreateCategoryOffer, useDeleteCategoryOffer } from '@/hooks/useAdmin';
+import { useCategoryOffers, useCreateCategoryOffer, useDeleteCategoryOffer, useUpdateCategoryOffer } from '@/hooks/useAdmin';
 import { useCategories } from '@/hooks/useCategories';
 import { Badge, TableSkeleton, Button, Input, Modal, ConfirmDialog, DatePicker, Select } from '@shared/components';
 import { getOfferStatusBadgeVariant } from '@/shared/utils/badge';
@@ -22,21 +22,40 @@ type CategoryOfferForm = z.infer<typeof offerSchema>;
 
 export default function CategoryOffers() {
   const [showCreate, setShowCreate] = useState(false);
+  const [editTarget, setEditTarget] = useState<string | null>(null);
   const [confirmClose, setConfirmClose] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const { data: categoryOffers, isLoading } = useCategoryOffers();
   const { mutate: createCO, isPending: creating } = useCreateCategoryOffer();
+  const { mutate: updateCO, isPending: updating } = useUpdateCategoryOffer();
   const { mutate: deleteCO } = useDeleteCategoryOffer();
   const { data: categories } = useCategories();
 
-  const form = useForm<CategoryOfferForm>({ resolver: zodResolver(offerSchema), defaultValues: { discountType: 'percentage' } });
+  const defaultFormValues = { category: '', discountType: 'percentage' as const, discountValue: '' as any, startDate: '', endDate: '' };
+  const form = useForm<CategoryOfferForm>({ resolver: zodResolver(offerSchema), defaultValues: defaultFormValues });
 
   const formValues = form.watch();
   const isFormDirty = !!(formValues.category || formValues.discountValue || formValues.startDate || formValues.endDate) || formValues.discountType !== 'percentage';
 
+  const handleEdit = (offer: any) => {
+    form.reset({
+      category: offer.category._id || offer.category,
+      discountType: offer.discountType,
+      discountValue: offer.discountValue,
+      startDate: new Date(offer.startDate).toISOString().split('T')[0],
+      endDate: new Date(offer.endDate).toISOString().split('T')[0],
+    });
+    setEditTarget(offer._id);
+    setShowCreate(true);
+  };
+
   const onSubmit = (data: CategoryOfferForm) => {
-    createCO(data, { onSuccess: () => { form.reset(); setShowCreate(false); } });
+    if (editTarget) {
+      updateCO({ id: editTarget, data }, { onSuccess: () => { form.reset(defaultFormValues); setShowCreate(false); setEditTarget(null); } });
+    } else {
+      createCO(data, { onSuccess: () => { form.reset(defaultFormValues); setShowCreate(false); setEditTarget(null); } });
+    }
   };
 
   return (
@@ -45,13 +64,13 @@ export default function CategoryOffers() {
       <div className={styles.page}>
         <div className={styles.sectionHeader}>
           <h1 className={styles.title}>Category Offers</h1>
-          <Button size="sm" leftIcon={<Plus size={14} />} onClick={() => setShowCreate(true)}>Add</Button>
+          <Button size="sm" leftIcon={<Plus size={14} />} onClick={() => { setEditTarget(null); form.reset(defaultFormValues); setShowCreate(true); }}>Add</Button>
         </div>
 
         {isLoading ? <TableSkeleton columns={5} gridTemplate="1fr 100px 180px 80px 40px" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
-              <span>Category</span><span>Discount</span><span>Period</span><span>Status</span><span></span>
+              <span>Category</span><span>Discount</span><span>Period</span><span>Status</span><span style={{ textAlign: 'right' }}>Actions</span>
             </div>
             {categoryOffers?.map((o) => {
               const name = typeof o.category === 'object' ? o.category.name : o.category;
@@ -62,7 +81,10 @@ export default function CategoryOffers() {
                   <span>{o.discountType === 'percentage' ? `${o.discountValue}%` : `₹${o.discountValue}`}</span>
                   <span className={styles.dates}>{new Date(o.startDate).toLocaleDateString('en-IN')} — {new Date(o.endDate).toLocaleDateString('en-IN')}</span>
                   <Badge variant={getOfferStatusBadgeVariant(active)}>{active ? 'Active' : 'Expired'}</Badge>
-                  <button className={styles.deleteBtn} onClick={() => setDeleteTarget({ id: o._id, name: typeof name === 'string' ? name : '' })}><Trash2 size={14} /></button>
+                  <div className={styles.actions} style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                    <button className={styles.editBtn} onClick={() => handleEdit(o)}><Edit2 size={14} /></button>
+                    <button className={styles.deleteBtn} onClick={() => setDeleteTarget({ id: o._id, name: typeof name === 'string' ? name : '' })}><Trash2 size={14} /></button>
+                  </div>
                 </div>
               );
             })}
@@ -72,8 +94,8 @@ export default function CategoryOffers() {
       </div>
 
       <Modal open={showCreate} onClose={() => {
-        if (isFormDirty) { setConfirmClose(true); } else { setShowCreate(false); form.reset(); }
-      }} title="Create Category Offer" size="md">
+        if (isFormDirty) { setConfirmClose(true); } else { setShowCreate(false); form.reset(defaultFormValues); setEditTarget(null); }
+      }} title={editTarget ? "Edit Category Offer" : "Create Category Offer"} size="md">
         <form onSubmit={form.handleSubmit(onSubmit)} className={styles.form}>
           <Controller name="category" control={form.control} render={({ field }) => (
             <Select label="Category" placeholder="Select category" options={categories?.map((c) => ({ label: c.name, value: c._id })) || []} value={field.value} onChange={field.onChange} error={form.formState.errors.category?.message} />
@@ -92,7 +114,7 @@ export default function CategoryOffers() {
               <DatePicker label="End Date" value={field.value} onChange={field.onChange} error={form.formState.errors.endDate?.message} />
             )} />
           </div>
-          <Button type="submit" fullWidth loading={creating}>Create Offer</Button>
+          <Button type="submit" fullWidth loading={creating || updating}>{editTarget ? "Update Offer" : "Create Offer"}</Button>
         </form>
       </Modal>
 
@@ -103,7 +125,7 @@ export default function CategoryOffers() {
         confirmLabel="Discard"
         cancelLabel="Keep editing"
         variant="warning"
-        onConfirm={() => { setConfirmClose(false); form.reset(); setShowCreate(false); }}
+        onConfirm={() => { setConfirmClose(false); form.reset(defaultFormValues); setShowCreate(false); setEditTarget(null); }}
         onCancel={() => setConfirmClose(false)}
       />
 

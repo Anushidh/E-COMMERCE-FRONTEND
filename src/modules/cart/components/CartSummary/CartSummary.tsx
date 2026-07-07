@@ -5,10 +5,12 @@ import styles from './CartSummary.module.css';
 interface CartSummaryProps {
   totalAmount: number;
   itemCount: number;
+  offerSavings: number;
 }
 
-export function CartSummary({ totalAmount, itemCount }: CartSummaryProps) {
-  const isFreeDelivery = totalAmount >= 499;
+export function CartSummary({ totalAmount, itemCount, offerSavings }: CartSummaryProps) {
+  const afterOffers = totalAmount - offerSavings;
+  const isFreeDelivery = afterOffers >= 499;
 
   return (
     <aside className={styles.summary}>
@@ -19,6 +21,12 @@ export function CartSummary({ totalAmount, itemCount }: CartSummaryProps) {
           <span>Subtotal ({itemCount} items)</span>
           <span>₹{totalAmount.toLocaleString('en-IN')}</span>
         </div>
+        {offerSavings > 0 && (
+          <div className={styles.row}>
+            <span>Offer Discount</span>
+            <span className={styles.free}>-₹{offerSavings.toFixed(2)}</span>
+          </div>
+        )}
         <div className={styles.row}>
           <span>Delivery</span>
           <span className={isFreeDelivery ? styles.free : ''}>
@@ -27,18 +35,24 @@ export function CartSummary({ totalAmount, itemCount }: CartSummaryProps) {
         </div>
         {!isFreeDelivery && (
           <p className={styles.hint}>
-            Add ₹{(499 - totalAmount).toLocaleString('en-IN')} more for free delivery
+            Add ₹{(499 - afterOffers).toLocaleString('en-IN')} more for free delivery
           </p>
         )}
       </div>
 
       <div className={styles.total}>
         <span>Total</span>
-        <span>₹{(isFreeDelivery ? totalAmount : totalAmount + 40).toLocaleString('en-IN')}</span>
+        <span>₹{(isFreeDelivery ? afterOffers : afterOffers + 40).toLocaleString('en-IN')}</span>
       </div>
 
-      <Link to="/checkout" className={styles.checkoutLink}>
-        <Button size="lg" fullWidth>
+      {(isFreeDelivery ? afterOffers : afterOffers + 40) < 50 && (
+        <p className={styles.hint} style={{ color: 'var(--color-danger)' }}>
+          Minimum cart value is ₹50
+        </p>
+      )}
+
+      <Link to={(isFreeDelivery ? afterOffers : afterOffers + 40) < 50 ? "#" : "/checkout"} className={styles.checkoutLink}>
+        <Button size="lg" fullWidth disabled={(isFreeDelivery ? afterOffers : afterOffers + 40) < 50}>
           Proceed to Checkout
         </Button>
       </Link>
