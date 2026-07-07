@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Outlet, NavLink, Navigate, useLocation } from 'react-router';
+import { Outlet, NavLink, Navigate, useLocation, useNavigate } from 'react-router';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '@shared/stores/authStore';
 import { useAdminLogout } from '@/hooks/useAuth';
@@ -134,6 +134,7 @@ export default function AdminLayout() {
 function NavGroup({ label, children, isActive, onNavigate }: { label: string; children: NavItem[]; isActive: boolean; onNavigate: () => void }) {
   const [expanded, setExpanded] = useState(isActive);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setExpanded(isActive);
@@ -143,7 +144,19 @@ function NavGroup({ label, children, isActive, onNavigate }: { label: string; ch
     <div className={styles.navGroup}>
       <button
         className={`${styles.navGroupToggle} ${isActive ? styles.navGroupActive : ''}`}
-        onClick={() => setExpanded(!expanded)}
+        onClick={() => {
+          if (!expanded) {
+            setExpanded(true);
+            const firstChild = children[0];
+            if (firstChild && !isActive) {
+              navigate(firstChild.to);
+              // Do NOT call onNavigate() here, otherwise mobile sidebar will close instantly
+              // when they just wanted to open the accordion and see the options
+            }
+          } else {
+            setExpanded(false);
+          }
+        }}
       >
         <span>{label}</span>
         <ChevronDown size={14} className={`${styles.navGroupChevron} ${expanded ? styles.navGroupChevronOpen : ''}`} />
