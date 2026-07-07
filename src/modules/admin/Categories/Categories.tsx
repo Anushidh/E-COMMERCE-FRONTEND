@@ -1,11 +1,10 @@
 import { useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Plus, Trash2, Pencil } from 'lucide-react';
+import { Plus, Trash2, Pencil, RotateCcw } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useCategories } from '@/hooks/useCategories';
-import { useCreateCategory, useDeleteCategory } from '@/hooks/useAdmin';
+import { useAdminCategories, useCreateCategory, useDeleteCategory, useRestoreCategory } from '@/hooks/useAdmin';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { adminService } from '@/services/admin.service';
@@ -23,15 +22,19 @@ type CategoryForm = z.infer<typeof categorySchema>;
 
 export default function Categories() {
   const [showCreate, setShowCreate] = useState(false);
+  const [showDeleted, setShowDeleted] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [editImageFile, setEditImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [confirmClose, setConfirmClose] = useState<'create' | 'edit' | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
-  const { data: categories, isLoading } = useCategories();
+  const [restoreTarget, setRestoreTarget] = useState<{ id: string; name: string } | null>(null);
+  
+  const { data: categories, isLoading } = useAdminCategories({ includeDeleted: showDeleted });
   const { mutate: create, isPending: creating } = useCreateCategory();
   const { mutate: deleteCategory } = useDeleteCategory();
+  const { mutate: restoreCategory } = useRestoreCategory();
   const qc = useQueryClient();
 
   const { register, handleSubmit, reset, watch, control, formState: { errors } } = useForm<CategoryForm>({
@@ -62,6 +65,19 @@ export default function Categories() {
     );
   })();
 
+  const createFileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleClearImage = () => {
+    setImageFile(null);
+    if (createFileInputRef.current) createFileInputRef.current.value = '';
+  };
+
+  const handleClearEditImage = () => {
+    setEditImageFile(null);
+    if (editFileInputRef.current) editFileInputRef.current.value = '';
+  };
+
   const onSubmit = (data: CategoryForm) => {
     const formData = new FormData();
     formData.append('name', data.name);
@@ -84,7 +100,7 @@ export default function Categories() {
       formData.append('gender', data.gender);
       if (editImageFile) formData.append('categoryImage', editImageFile);
       await adminService.updateCategory(editingId, formData);
-      qc.invalidateQueries({ queryKey: ['categories'] });
+      qc.invalidateQueries({ queryKey: ['adminCategories'] });
       toast.success('Category updated');
       setEditingId(null);
       setEditImageFile(null);
@@ -108,13 +124,19 @@ export default function Categories() {
       <div className={styles.page}>
         <div className={styles.header}>
           <h1 className={styles.title}>Categories</h1>
-          <Button size="sm" leftIcon={<Plus size={14} />} onClick={() => setShowCreate(true)}>Create</Button>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+              <input type="checkbox" checked={showDeleted} onChange={(e) => setShowDeleted(e.target.checked)} />
+              Show Deleted
+            </label>
+            <Button size="sm" leftIcon={<Plus size={14} />} onClick={() => setShowCreate(true)}>Create</Button>
+          </div>
         </div>
 
         {isLoading ? <CardGridSkeleton /> : (
           <div className={styles.grid}>
             {categories?.map((cat) => (
-              <div key={cat._id} className={styles.card}>
+              <div key={cat._id} className={styles.card} style={{ opacity: cat.isDeleted ? 0.6 : 1 }}>
                 <div className={styles.cardImage}>
                   {cat.image ? (
                     <img src={cat.image} alt={cat.name} className={styles.cardImg} />
@@ -125,24 +147,37 @@ export default function Categories() {
                 <div className={styles.cardBody}>
                   <div className={styles.cardInfo}>
                     <h3 className={styles.cardName}>{cat.name}</h3>
-                    <Badge variant={getGenderBadgeVariant(cat.gender)}>{cat.gender}</Badge>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <Badge variant={getGenderBadgeVariant(cat.gender)}>{cat.gender}</Badge>
+                      {cat.isDeleted && <Badge variant="error">Deleted</Badge>}
+                    </div>
                   </div>
                   {cat.description && <p className={styles.cardDesc}>{cat.description}</p>}
                   <div className={styles.cardActions}>
-                    <button
-                      className={styles.cardEdit}
-                      onClick={() => openEdit(cat)}
-                      aria-label={`Edit ${cat.name}`}
-                    >
-                      <Pencil size={14} /> Edit
-                    </button>
-                    <button
-                      className={styles.cardDelete}
-                      onClick={() => setDeleteTarget({ id: cat._id, name: cat.name })}
-                      aria-label={`Delete ${cat.name}`}
-                    >
-                      <Trash2 size={14} /> Delete
-                    </button>
+                    {cat.isDeleted ? (
+                      <Button size="sm" variant="primary" onClick={() => setRestoreTarget({ id: cat._id, name: cat.name })}>
+                        <RotateCcw size={14} style={{ marginRight: '6px' }} /> Restore
+                      </Button>
+                    ) : (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => openEdit(cat)}
+                          aria-label={`Edit ${cat.name}`}
+                        >
+                          <Pencil size={14} style={{ marginRight: '6px' }} /> Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          onClick={() => setDeleteTarget({ id: cat._id, name: cat.name })}
+                          aria-label={`Delete ${cat.name}`}
+                        >
+                          <Trash2 size={14} style={{ marginRight: '6px' }} /> Delete
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -177,8 +212,16 @@ export default function Categories() {
             )}
           />
           <div className={styles.fieldWrap}>
-            <label className={styles.label}>Image (optional)</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label className={styles.label}>Image (optional)</label>
+              {imageFile && (
+                <button type="button" onClick={handleClearImage} style={{ fontSize: '12px', color: 'var(--color-error)', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                  Clear
+                </button>
+              )}
+            </div>
             <input
+              ref={createFileInputRef}
               type="file"
               accept="image/*"
               onChange={(e) => setImageFile(e.target.files?.[0] || null)}
@@ -213,8 +256,15 @@ export default function Categories() {
             )}
           />
           <div className={styles.fieldWrap}>
-            <label className={styles.label}>New Image (optional)</label>
-            <input type="file" accept="image/*" onChange={(e) => setEditImageFile(e.target.files?.[0] || null)} className={styles.fileInput} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label className={styles.label}>New Image (optional)</label>
+              {editImageFile && (
+                <button type="button" onClick={handleClearEditImage} style={{ fontSize: '12px', color: 'var(--color-error)', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                  Clear
+                </button>
+              )}
+            </div>
+            <input ref={editFileInputRef} type="file" accept="image/*" onChange={(e) => setEditImageFile(e.target.files?.[0] || null)} className={styles.fileInput} />
           </div>
           <Button type="submit" fullWidth loading={saving}>Save Changes</Button>
         </form>
@@ -246,12 +296,24 @@ export default function Categories() {
       <ConfirmDialog
         open={!!deleteTarget}
         title="Delete category?"
-        description={`This will permanently delete "${deleteTarget?.name}". This action cannot be undone.`}
+        description={`This will delete "${deleteTarget?.name}".`}
         confirmLabel="Delete"
         cancelLabel="Cancel"
         variant="danger"
         onConfirm={() => { if (deleteTarget) deleteCategory(deleteTarget.id); setDeleteTarget(null); }}
         onCancel={() => setDeleteTarget(null)}
+      />
+
+      {/* Restore confirm */}
+      <ConfirmDialog
+        open={!!restoreTarget}
+        title="Restore category?"
+        description={`This will restore "${restoreTarget?.name}" making it active again.`}
+        confirmLabel="Restore"
+        cancelLabel="Cancel"
+        variant="primary"
+        onConfirm={() => { if (restoreTarget) restoreCategory(restoreTarget.id); setRestoreTarget(null); }}
+        onCancel={() => setRestoreTarget(null)}
       />
     </>
   );

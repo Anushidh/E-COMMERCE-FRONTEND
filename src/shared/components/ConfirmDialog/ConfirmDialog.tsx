@@ -11,7 +11,7 @@ interface ConfirmDialogProps {
   description?: string;
   confirmLabel?: string;
   cancelLabel?: string;
-  variant?: 'danger' | 'warning';
+  variant?: 'danger' | 'warning' | 'primary';
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -81,7 +81,7 @@ export function ConfirmDialog({
                 {cancelLabel}
               </Button>
               <Button
-                variant="danger"
+                variant={variant === 'danger' ? 'danger' : 'primary'}
                 fullWidth
                 onClick={(e) => {
                   e.stopPropagation();

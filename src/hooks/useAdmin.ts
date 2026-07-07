@@ -192,11 +192,19 @@ export function useUpdateCategoryOffer() {
 
 // ─── Products (Admin CRUD) ───────────────────────────────────────────────────
 
+export function useAdminProducts(params: { page?: string; limit?: string; search?: string; status?: string; includeDeleted?: boolean }) {
+  return useQuery({
+    queryKey: ['adminProducts', params],
+    queryFn: () => adminService.getAdminProducts(params),
+    select: (res) => res.data.data,
+  });
+}
+
 export function useCreateProduct() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: adminService.createProduct,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['products'] }); toast.success('Product created'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['products'] }); qc.invalidateQueries({ queryKey: ['adminProducts'] }); toast.success('Product created'); },
     onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
   });
 }
@@ -205,7 +213,16 @@ export function useDeleteProduct() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: adminService.deleteProduct,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['products'] }); toast.success('Product deleted'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['products'] }); qc.invalidateQueries({ queryKey: ['adminProducts'] }); toast.success('Product deleted'); },
+    onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
+  });
+}
+
+export function useRestoreProduct() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: adminService.restoreProduct,
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['products'] }); qc.invalidateQueries({ queryKey: ['adminProducts'] }); toast.success('Product restored'); },
     onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
   });
 }
@@ -222,11 +239,19 @@ export function useAdjustStock() {
 
 // ─── Categories (Admin CRUD) ─────────────────────────────────────────────────
 
+export function useAdminCategories(params?: { includeDeleted?: boolean }) {
+  return useQuery({
+    queryKey: ['adminCategories', params],
+    queryFn: () => adminService.getAdminCategories(params),
+    select: (res) => res.data.data,
+  });
+}
+
 export function useCreateCategory() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: adminService.createCategory,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['categories'] }); toast.success('Category created'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['categories'] }); qc.invalidateQueries({ queryKey: ['adminCategories'] }); toast.success('Category created'); },
     onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
   });
 }
@@ -235,7 +260,16 @@ export function useDeleteCategory() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: adminService.deleteCategory,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['categories'] }); toast.success('Category deleted'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['categories'] }); qc.invalidateQueries({ queryKey: ['adminCategories'] }); toast.success('Category deleted'); },
+    onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
+  });
+}
+
+export function useRestoreCategory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: adminService.restoreCategory,
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['categories'] }); qc.invalidateQueries({ queryKey: ['adminCategories'] }); toast.success('Category restored'); },
     onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
   });
 }

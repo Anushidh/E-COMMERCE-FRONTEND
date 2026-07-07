@@ -57,10 +57,10 @@ export default function Coupons() {
           <Button size="sm" leftIcon={<Plus size={14} />} onClick={() => setShowCreate(true)}>Create</Button>
         </div>
 
-        {isLoading ? <TableSkeleton columns={7} gridTemplate="1fr 100px 100px 100px 120px 90px 50px" /> : (
+        {isLoading ? <TableSkeleton columns={7} gridTemplate="1fr 100px 100px 100px 120px 90px 160px" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
-              <span>Code</span><span>Type</span><span>Value</span><span>Used</span><span>Expiry</span><span>Status</span><span></span>
+              <span>Code</span><span>Type</span><span>Value</span><span>Used</span><span>Expiry</span><span>Status</span><span>Actions</span>
             </div>
             {data?.coupons?.map((c) => (
               <div key={c._id} className={styles.tableRow}>
@@ -72,7 +72,12 @@ export default function Coupons() {
                 <Badge variant={getOfferStatusBadgeVariant(c.isActive && new Date(c.expiryDate) > new Date())}>
                   {c.isActive && new Date(c.expiryDate) > new Date() ? 'Active' : 'Expired'}
                 </Badge>
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  {c.isActive ? (
+                    <Button size="sm" variant="secondary" onClick={() => update({ id: c._id, data: { isActive: false } })}>Pause</Button>
+                  ) : (
+                    <Button size="sm" variant="primary" onClick={() => update({ id: c._id, data: { isActive: true } })}>Activate</Button>
+                  )}
                   <button className={styles.deleteBtn} onClick={() => {
                     setEditTargetId(c._id);
                     reset({

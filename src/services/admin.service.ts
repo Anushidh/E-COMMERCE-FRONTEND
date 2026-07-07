@@ -66,6 +66,7 @@ export interface CreateCouponPayload {
   usageLimitPerUser?: number;
   totalUsageLimit: number;
   expiryDate: string;
+  isActive?: boolean;
 }
 
 // ─── Offers ──────────────────────────────────────────────────────────────────
@@ -176,12 +177,18 @@ export const adminService = {
     apiClient.delete(`/offers/category/${id}`),
 
   // Products (admin CRUD)
+  getAdminProducts: (params: { page?: string; limit?: string; search?: string; status?: string; includeDeleted?: boolean }) =>
+    apiClient.get<ApiResponse<{ products: any[]; pagination: { total: number; page: number; limit: number; totalPages: number } }>>(
+      '/products/admin/all', { params }
+    ),
   createProduct: (data: FormData) =>
     apiClient.post<ApiResponse>('/products', data, { headers: { 'Content-Type': 'multipart/form-data' } }),
   updateProduct: (id: string, data: FormData) =>
     apiClient.put<ApiResponse>(`/products/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
   deleteProduct: (id: string) =>
     apiClient.delete(`/products/${id}`),
+  restoreProduct: (id: string) =>
+    apiClient.patch(`/products/${id}/restore`),
   removeProductImage: (id: string, imageUrl: string) =>
     apiClient.patch(`/products/${id}/remove-image`, { imageUrl }),
   addVariant: (productId: string, data: { size: string; color: string; stock: number; sku?: string; price?: number }) =>
@@ -194,12 +201,16 @@ export const adminService = {
     apiClient.patch(`/products/variants/${variantId}/stock`, { adjustment }),
 
   // Categories (admin CRUD)
+  getAdminCategories: (params?: { includeDeleted?: boolean }) =>
+    apiClient.get<ApiResponse<any[]>>('/categories/admin/all', { params }),
   createCategory: (data: FormData) =>
     apiClient.post<ApiResponse>('/categories', data, { headers: { 'Content-Type': 'multipart/form-data' } }),
   updateCategory: (id: string, data: FormData) =>
     apiClient.put<ApiResponse>(`/categories/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
   deleteCategory: (id: string) =>
     apiClient.delete(`/categories/${id}`),
+  restoreCategory: (id: string) =>
+    apiClient.patch(`/categories/${id}/restore`),
 
   // Inventory
   getLowStock: () =>
