@@ -26,6 +26,8 @@ export function ImagesTab({ productId, images }: ImagesTabProps) {
       Array.from(files).forEach((f) => formData.append('productImages', f));
       await adminService.updateProduct(productId, formData);
       qc.invalidateQueries({ queryKey: ['product'] });
+      qc.invalidateQueries({ queryKey: ['products'] });
+      qc.invalidateQueries({ queryKey: ['adminProducts'] });
       toast.success('Images uploaded');
     } catch {
       toast.error('Upload failed');
@@ -40,6 +42,8 @@ export function ImagesTab({ productId, images }: ImagesTabProps) {
     try {
       await adminService.removeProductImage(productId, imageUrl);
       qc.invalidateQueries({ queryKey: ['product'] });
+      qc.invalidateQueries({ queryKey: ['products'] });
+      qc.invalidateQueries({ queryKey: ['adminProducts'] });
       toast.success('Image removed');
     } catch {
       toast.error('Failed to remove');
