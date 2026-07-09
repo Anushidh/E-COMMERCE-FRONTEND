@@ -26,7 +26,7 @@ export default function Users() {
           </div>
         </div>
 
-        {isLoading ? <TableSkeleton columns={7} gridTemplate="1fr 1fr 130px 80px 80px 100px 100px" /> : (
+        {isLoading ? <TableSkeleton columns={7} gridTemplate="minmax(160px, 1.5fr) minmax(240px, 2fr) 140px 90px 90px 120px 140px" minWidth="1100px" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
               <span>Name</span>

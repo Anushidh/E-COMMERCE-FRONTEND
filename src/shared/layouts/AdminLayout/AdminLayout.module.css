@@ -1,15 +1,16 @@
 .layout {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* ─── Sidebar ─────────────────────────────────────────────────────────────── */
 .sidebar {
   position: fixed;
   top: 0;
+  bottom: 0;
   left: 0;
   width: 240px;
-  height: 100vh;
   background-color: var(--bg-inverse);
   color: var(--text-inverse);
   display: flex;
@@ -160,6 +161,7 @@
   margin-left: 240px;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .header {
@@ -193,6 +195,7 @@
   flex: 1;
   padding: var(--space-6);
   background-color: var(--bg-secondary);
+  min-width: 0;
 }
 
 @media (min-width: 1024px) {

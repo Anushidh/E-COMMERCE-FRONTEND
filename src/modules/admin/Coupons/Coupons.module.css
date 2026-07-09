@@ -1,9 +1,10 @@
-.page { display: flex; flex-direction: column; gap: var(--space-6); }
+.page { display: flex; flex-direction: column; gap: var(--space-6); min-width: 0; }
 .header { display: flex; align-items: center; justify-content: space-between; }
 .title { font-size: var(--text-lg); font-weight: var(--weight-medium); }
 .table { background: var(--bg-primary); border: 1px solid var(--border-secondary); border-radius: var(--radius-md); overflow-x: auto; }
-.tableHeader { display: grid; grid-template-columns: 1fr 100px 100px 100px 120px 90px 160px; gap: var(--space-3); padding: var(--space-3) var(--space-4); font-size: var(--text-xs); font-weight: var(--weight-semibold); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: var(--tracking-wider); border-bottom: 1px solid var(--border-secondary); }
-.tableRow { display: grid; grid-template-columns: 1fr 100px 100px 100px 120px 90px 160px; gap: var(--space-3); padding: var(--space-3) var(--space-4); font-size: var(--text-sm); align-items: center; border-bottom: 1px solid var(--border-secondary); }
+.tableHeader { display: grid; grid-template-columns: 1.5fr 120px 120px 120px 140px 100px 180px; min-width: 950px; gap: var(--space-3); padding: var(--space-3) var(--space-4); font-size: var(--text-xs); font-weight: var(--weight-semibold); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: var(--tracking-wider); border-bottom: 1px solid var(--border-secondary); }
+.tableHeader span:last-child { text-align: center; }
+.tableRow { display: grid; grid-template-columns: 1.5fr 120px 120px 120px 140px 100px 180px; min-width: 950px; gap: var(--space-3); padding: var(--space-3) var(--space-4); font-size: var(--text-sm); align-items: center; border-bottom: 1px solid var(--border-secondary); }
 .tableRow:last-child { border-bottom: none; }
 .code { font-weight: var(--weight-semibold); font-family: var(--font-mono); font-size: var(--text-xs); }
 .deleteBtn { display: flex; align-items: center; color: var(--text-tertiary); transition: var(--transition-colors); }

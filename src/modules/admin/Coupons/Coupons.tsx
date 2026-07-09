@@ -57,7 +57,7 @@ export default function Coupons() {
           <Button size="sm" leftIcon={<Plus size={14} />} onClick={() => setShowCreate(true)}>Create</Button>
         </div>
 
-        {isLoading ? <TableSkeleton columns={7} gridTemplate="1fr 100px 100px 100px 120px 90px 160px" /> : (
+        {isLoading ? <TableSkeleton columns={7} gridTemplate="1.5fr 120px 120px 120px 140px 100px 180px" minWidth="950px" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
               <span>Code</span><span>Type</span><span>Value</span><span>Used</span><span>Expiry</span><span>Status</span><span>Actions</span>
@@ -72,7 +72,7 @@ export default function Coupons() {
                 <Badge variant={getOfferStatusBadgeVariant(c.isActive && new Date(c.expiryDate) > new Date())}>
                   {c.isActive && new Date(c.expiryDate) > new Date() ? 'Active' : 'Expired'}
                 </Badge>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
                   {c.isActive ? (
                     <Button size="sm" variant="secondary" onClick={() => update({ id: c._id, data: { isActive: false } })}>Pause</Button>
                   ) : (

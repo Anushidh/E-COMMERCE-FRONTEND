@@ -67,10 +67,10 @@ export default function CategoryOffers() {
           <Button size="sm" leftIcon={<Plus size={14} />} onClick={() => { setEditTarget(null); form.reset(defaultFormValues); setShowCreate(true); }}>Add</Button>
         </div>
 
-        {isLoading ? <TableSkeleton columns={5} gridTemplate="1fr 100px 180px 80px 40px" /> : (
+        {isLoading ? <TableSkeleton columns={5} gridTemplate="minmax(180px, 1fr) 100px 180px 100px 120px" minWidth="800px" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
-              <span>Category</span><span>Discount</span><span>Period</span><span>Status</span><span style={{ textAlign: 'right' }}>Actions</span>
+              <span>Category</span><span>Discount</span><span>Duration</span><span>Status</span><span>Actions</span>
             </div>
             {categoryOffers?.map((o) => {
               const name = typeof o.category === 'object' ? o.category.name : o.category;
@@ -81,7 +81,7 @@ export default function CategoryOffers() {
                   <span>{o.discountType === 'percentage' ? `${o.discountValue}%` : `₹${o.discountValue}`}</span>
                   <span className={styles.dates}>{new Date(o.startDate).toLocaleDateString('en-IN')} — {new Date(o.endDate).toLocaleDateString('en-IN')}</span>
                   <Badge variant={getOfferStatusBadgeVariant(active)}>{active ? 'Active' : 'Expired'}</Badge>
-                  <div className={styles.actions} style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                     <button className={styles.editBtn} onClick={() => handleEdit(o)}><Edit2 size={14} /></button>
                     <button className={styles.deleteBtn} onClick={() => setDeleteTarget({ id: o._id, name: typeof name === 'string' ? name : '' })}><Trash2 size={14} /></button>
                   </div>

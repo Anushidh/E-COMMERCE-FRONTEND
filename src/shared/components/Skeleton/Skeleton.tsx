@@ -40,9 +40,10 @@ interface TableSkeletonProps {
   columns: number;
   rows?: number;
   gridTemplate?: string;
+  minWidth?: string;
 }
 
-export function TableSkeleton({ columns, rows = 6, gridTemplate }: TableSkeletonProps) {
+export function TableSkeleton({ columns, rows = 6, gridTemplate, minWidth }: TableSkeletonProps) {
   const columnWidths = Array.from({ length: columns }, (_, i) => {
     if (i === 0) return '40%';
     if (i === columns - 1) return '50%';
@@ -53,7 +54,10 @@ export function TableSkeleton({ columns, rows = 6, gridTemplate }: TableSkeleton
     <div className={styles.tableWrapper}>
       <div
         className={styles.tableHeaderSkeleton}
-        style={gridTemplate ? { gridTemplateColumns: gridTemplate } : { gridTemplateColumns: `repeat(${columns}, 1fr)` }}
+        style={{
+          ...(gridTemplate ? { gridTemplateColumns: gridTemplate } : { gridTemplateColumns: `repeat(${columns}, 1fr)` }),
+          ...(minWidth ? { minWidth } : {})
+        }}
       >
         {Array.from({ length: columns }).map((_, i) => (
           <Skeleton key={i} width="70%" height="0.625rem" />
@@ -63,7 +67,10 @@ export function TableSkeleton({ columns, rows = 6, gridTemplate }: TableSkeleton
         <div
           key={rowIdx}
           className={styles.tableRowSkeleton}
-          style={gridTemplate ? { gridTemplateColumns: gridTemplate } : { gridTemplateColumns: `repeat(${columns}, 1fr)` }}
+          style={{
+            ...(gridTemplate ? { gridTemplateColumns: gridTemplate } : { gridTemplateColumns: `repeat(${columns}, 1fr)` }),
+            ...(minWidth ? { minWidth } : {})
+          }}
         >
           {Array.from({ length: columns }).map((_, colIdx) => (
             <Skeleton key={colIdx} width={columnWidths[colIdx]} height="0.75rem" />

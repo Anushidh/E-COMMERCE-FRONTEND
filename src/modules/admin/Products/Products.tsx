@@ -71,27 +71,25 @@ export default function Products() {
       <div className={styles.page}>
         <div className={styles.header}>
           <h1 className={styles.title}>Products</h1>
-          <div className={styles.headerActions}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-secondary)', cursor: 'pointer' }}>
-              <input type="checkbox" checked={showDeleted} onChange={(e) => { setShowDeleted(e.target.checked); setPage(1); }} />
-              Show Deleted
-            </label>
-            <div className={styles.searchWrapper}>
-              <Input
-                placeholder="Search products..."
-                value={search}
-                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                leftIcon={<Search size={14} />}
-              />
-            </div>
-            <Link to="/admin/products/new">
-              <Button size="sm" leftIcon={<Plus size={14} />}>Add Product</Button>
-            </Link>
+          <label className={styles.deletedCheckbox}>
+            <input type="checkbox" checked={showDeleted} onChange={(e) => { setShowDeleted(e.target.checked); setPage(1); }} />
+            Show Deleted
+          </label>
+          <div className={styles.searchWrapper}>
+            <Input
+              placeholder="Search products..."
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              leftIcon={<Search size={14} />}
+            />
           </div>
+          <Link to="/admin/products/new">
+            <Button className={styles.addBtn} size="sm" leftIcon={<Plus size={14} />}>Add Product</Button>
+          </Link>
         </div>
 
         {isLoading ? (
-          <TableSkeleton columns={8} gridTemplate="50px 1fr 90px 80px 60px 50px 90px 180px" />
+          <TableSkeleton columns={8} gridTemplate="60px 1.5fr 100px 90px 80px 60px 100px 200px" minWidth="900px" />
         ) : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>

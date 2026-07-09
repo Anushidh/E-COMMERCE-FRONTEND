@@ -50,7 +50,7 @@ export default function Orders() {
           </div>
         </div>
 
-        {isLoading ? <TableSkeleton columns={5} gridTemplate="130px 1fr 100px 120px 200px" /> : (
+        {isLoading ? <TableSkeleton columns={5} gridTemplate="180px 1fr 100px 140px 220px" minWidth="800px" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
               <span>Order ID</span>

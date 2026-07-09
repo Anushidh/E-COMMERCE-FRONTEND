@@ -27,7 +27,7 @@ export default function Inventory() {
           <Badge variant="warning"><AlertTriangle size={12} /> {variants?.length || 0} items</Badge>
         </div>
 
-        {isLoading ? <TableSkeleton columns={4} gridTemplate="1fr 120px 70px 140px" /> : (
+        {isLoading ? <TableSkeleton columns={4} gridTemplate="minmax(200px, 1.5fr) 140px 100px 160px" minWidth="650px" /> : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
               <span>Product</span><span>Variant</span><span>Stock</span><span>Action</span>
