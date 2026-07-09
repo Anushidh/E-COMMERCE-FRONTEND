@@ -46,6 +46,12 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
+    // Do not attempt to refresh token if the original request was an auth action (login, logout, signup, etc.)
+    const authRoutes = ['/login', '/logout', '/signup', '/verify-otp', '/forgot-password', '/reset-password', '/resend-otp'];
+    if (authRoutes.some(route => originalRequest.url?.includes(route))) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
