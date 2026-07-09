@@ -4,7 +4,7 @@
 
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-4); }
 .card { background: var(--bg-primary); border: 1px solid var(--border-secondary); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; }
-.cardImage { aspect-ratio: 16 / 9; overflow: hidden; background: var(--bg-tertiary); }
+.cardImage { aspect-ratio: 1 / 1; overflow: hidden; background: var(--bg-tertiary); }
 .cardImg { width: 100%; height: 100%; object-fit: cover; }
 .cardPlaceholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: var(--text-2xl); font-weight: var(--weight-bold); color: var(--text-tertiary); }
 .cardBody { padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); flex: 1; }
