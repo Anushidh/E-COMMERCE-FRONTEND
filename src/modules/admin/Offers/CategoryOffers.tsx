@@ -10,13 +10,25 @@ import { Badge, TableSkeleton, Button, Input, Modal, ConfirmDialog, DatePicker, 
 import { getOfferStatusBadgeVariant } from '@/shared/utils/badge';
 import styles from './Offers.module.css';
 
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const todayStr = today.toISOString().split('T')[0];
+
 const offerSchema = z.object({
   category: z.string().min(1, 'Select category'),
   discountType: z.enum(['percentage', 'flat']),
   discountValue: z.coerce.number().min(1),
-  startDate: z.string().min(1, 'Required'),
+  startDate: z.string().min(1, 'Required').refine((val) => {
+    const d = new Date(val + 'T00:00:00');
+    return d >= today;
+  }, { message: 'Start date cannot be in the past' }),
   endDate: z.string().min(1, 'Required'),
-});
+}).refine((data) => {
+  if (data.startDate && data.endDate) {
+    return new Date(data.endDate) >= new Date(data.startDate);
+  }
+  return true;
+}, { message: 'End date must be after start date', path: ['endDate'] });
 
 type CategoryOfferForm = z.infer<typeof offerSchema>;
 
@@ -108,10 +120,10 @@ export default function CategoryOffers() {
           </div>
           <div className={styles.row}>
             <Controller name="startDate" control={form.control} render={({ field }) => (
-              <DatePicker label="Start Date" value={field.value} onChange={field.onChange} error={form.formState.errors.startDate?.message} />
+              <DatePicker label="Start Date" value={field.value} onChange={field.onChange} minDate={todayStr} error={form.formState.errors.startDate?.message} />
             )} />
             <Controller name="endDate" control={form.control} render={({ field }) => (
-              <DatePicker label="End Date" value={field.value} onChange={field.onChange} error={form.formState.errors.endDate?.message} />
+              <DatePicker label="End Date" value={field.value} onChange={field.onChange} minDate={formValues.startDate || todayStr} error={form.formState.errors.endDate?.message} />
             )} />
           </div>
           <Button type="submit" fullWidth loading={creating || updating}>{editTarget ? "Update Offer" : "Create Offer"}</Button>
