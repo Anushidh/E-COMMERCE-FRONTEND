@@ -1,8 +1,19 @@
 import { Helmet } from 'react-helmet-async';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
+import { useState, useEffect, useRef } from 'react';
 import styles from './Home.module.css';
+
+import heroImg from '../../../assets/images/home/hero.jpg';
+import heroMenImg from '../../../assets/images/home/hero_men.jpg';
+import heroSneakersImg from '../../../assets/images/home/hero_sneakers.jpg';
+import womenImg from '../../../assets/images/home/women.jpg';
+import menImg from '../../../assets/images/home/men.jpg';
+import accessoriesImg from '../../../assets/images/home/accessories.jpg';
+import highlightImg from '../../../assets/images/home/highlight.jpg';
+import highlightSustainabilityImg from '../../../assets/images/home/highlight_sustainability.jpg';
+import highlightDesignImg from '../../../assets/images/home/highlight_design.jpg';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -13,7 +24,64 @@ const fadeUp = {
   }),
 };
 
+const heroImages = [heroImg, heroMenImg, heroSneakersImg];
+
+const highlightSlides = [
+  {
+    image: highlightImg,
+    tag: "Craftsmanship",
+    heading: "Built to Last",
+    text: "Every piece is crafted with intention - premium fabrics, timeless silhouettes, and the kind of detail you feel before you see.",
+    linkText: "Shop All",
+    href: "/shop"
+  },
+  {
+    image: highlightSustainabilityImg,
+    tag: "Sustainability",
+    heading: "Thoughtfully Sourced",
+    text: "We believe in fashion that leaves a lighter footprint. Organic cottons, recycled materials, and ethical manufacturing.",
+    linkText: "Our Mission",
+    href: "/shop"
+  },
+  {
+    image: highlightDesignImg,
+    tag: "Design",
+    heading: "Minimalist by Nature",
+    text: "True elegance lies in simplicity. Stripped of excess, our designs focus on what matters most: cut, comfort, and character.",
+    linkText: "Explore Design",
+    href: "/shop"
+  }
+];
+
 export default function Home() {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentHighlightIndex, setCurrentHighlightIndex] = useState(0);
+
+  const heroRef = useRef(null);
+  const highlightRef = useRef(null);
+  const isHeroInView = useInView(heroRef, { margin: "0px", amount: 0.5 });
+  const isHighlightInView = useInView(highlightRef, { margin: "0px", amount: 0.5 });
+
+  useEffect(() => {
+    let heroInterval: ReturnType<typeof setInterval>;
+    if (isHeroInView) {
+      heroInterval = setInterval(() => {
+        setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
+      }, 4000);
+    }
+    return () => clearInterval(heroInterval);
+  }, [isHeroInView]);
+
+  useEffect(() => {
+    let highlightInterval: ReturnType<typeof setInterval>;
+    if (isHighlightInView) {
+      highlightInterval = setInterval(() => {
+        setCurrentHighlightIndex((prev) => (prev + 1) % highlightSlides.length);
+      }, 3000);
+    }
+    return () => clearInterval(highlightInterval);
+  }, [isHighlightInView]);
+
   return (
     <>
       <Helmet>
@@ -22,7 +90,7 @@ export default function Home() {
       </Helmet>
 
       {/* ─── Hero ─────────────────────────────────────────────────────────────── */}
-      <section className={styles.hero}>
+      <section className={styles.hero} ref={heroRef}>
         <div className={styles.heroContent}>
           <motion.span
             className={styles.heroTag}
@@ -65,15 +133,22 @@ export default function Home() {
           </motion.div>
         </div>
         <div className={styles.heroImage}>
-          <img
-            src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&q=80"
-            alt="Fashion editorial"
-            className={styles.heroImg}
-          />
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={currentImageIndex}
+              src={heroImages[currentImageIndex]}
+              alt="Fashion editorial"
+              className={styles.heroImg}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2 }}
+            />
+          </AnimatePresence>
         </div>
       </section>
 
-      {/* ─── Editorial Strip ──────────────────────────────────────────────────── */}
+      {/* â”€â”€â”€ Editorial Strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className={styles.editorial}>
         <motion.p
           className={styles.editorialText}
@@ -86,59 +161,68 @@ export default function Home() {
         </motion.p>
       </section>
 
-      {/* ─── Category Grid ────────────────────────────────────────────────────── */}
+      {/* â”€â”€â”€ Category Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className={styles.categories}>
         <div className={styles.categoryGrid}>
           <CategoryCard
             title="Women"
             href="/shop?gender=Women"
-            image="https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=800&q=80"
+            image={womenImg}
             delay={0.1}
           />
           <CategoryCard
             title="Men"
             href="/shop?gender=Men"
-            image="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80"
+            image={menImg}
             delay={0.2}
           />
           <CategoryCard
-            title="Accessories"
-            href="/shop"
-            image="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80"
+            title="Shoes"
+            href="/shop?category=Shoes"
+            image={accessoriesImg}
             delay={0.3}
           />
         </div>
       </section>
 
-      {/* ─── Highlight Section ────────────────────────────────────────────────── */}
-      <section className={styles.highlight}>
+      {/* ─── Highlight Section -------------------------------------------------- */}
+      <section className={styles.highlight} ref={highlightRef}>
         <div className={styles.highlightImage}>
-          <img
-            src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80"
-            alt="Store ambience"
-            className={styles.highlightImg}
-          />
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={currentHighlightIndex}
+              src={highlightSlides[currentHighlightIndex]!.image}
+              alt="Store ambience"
+              className={styles.highlightImg}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1 }}
+            />
+          </AnimatePresence>
         </div>
-        <motion.div
-          className={styles.highlightContent}
-          initial={{ opacity: 0, x: 40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-        >
-          <span className={styles.highlightTag}>Craftsmanship</span>
-          <h2 className={styles.highlightHeading}>Built to Last</h2>
-          <p className={styles.highlightText}>
-            Every piece is crafted with intention — premium fabrics, timeless silhouettes,
-            and the kind of detail you feel before you see.
-          </p>
-          <Link to="/shop" className={styles.highlightLink}>
-            Shop All <ArrowRight size={14} />
-          </Link>
-        </motion.div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentHighlightIndex}
+            className={styles.highlightContent}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -40 }}
+            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <span className={styles.highlightTag}>{highlightSlides[currentHighlightIndex]!.tag}</span>
+            <h2 className={styles.highlightHeading}>{highlightSlides[currentHighlightIndex]!.heading}</h2>
+            <p className={styles.highlightText}>
+              {highlightSlides[currentHighlightIndex]!.text}
+            </p>
+            <Link to={highlightSlides[currentHighlightIndex]!.href} className={styles.highlightLink}>
+              {highlightSlides[currentHighlightIndex]!.linkText} <ArrowRight size={14} />
+            </Link>
+          </motion.div>
+        </AnimatePresence>
       </section>
 
-      {/* ─── Values Strip ─────────────────────────────────────────────────────── */}
+      {/* â”€â”€â”€ Values Strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className={styles.values}>
         <div className={styles.valuesGrid}>
           <ValueItem title="Free Shipping" desc="On orders above ₹499" />
@@ -148,7 +232,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Newsletter ───────────────────────────────────────────────────────── */}
+      {/* â”€â”€â”€ Newsletter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className={styles.newsletter}>
         <motion.div
           className={styles.newsletterContent}
@@ -178,7 +262,7 @@ export default function Home() {
   );
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Sub-components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function CategoryCard({ title, href, image, delay }: { title: string; href: string; image: string; delay: number }) {
   return (
@@ -209,3 +293,8 @@ function ValueItem({ title, desc }: { title: string; desc: string }) {
     </div>
   );
 }
+
+
+
+
+

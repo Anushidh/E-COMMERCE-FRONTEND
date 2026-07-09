@@ -14,6 +14,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
 body {
@@ -25,6 +26,7 @@ body {
   font-weight: var(--weight-regular);
   color: var(--text-primary);
   background-color: var(--bg-primary);
+  overflow-x: hidden;
 }
 
 img,

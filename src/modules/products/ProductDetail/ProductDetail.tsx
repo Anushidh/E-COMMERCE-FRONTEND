@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 import { Helmet } from 'react-helmet-async';
 import { Heart, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
@@ -18,6 +18,7 @@ import styles from './ProductDetail.module.css';
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const { data, isLoading } = useProductDetail(slug || '');
 
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
@@ -145,6 +146,11 @@ export default function ProductDetail() {
                 loading={addingToCart}
                 leftIcon={<ShoppingBag size={18} />}
                 onClick={() => {
+                  if (!isAuthenticated) {
+                    toast.error('Please log in to add items to your cart');
+                    navigate('/login');
+                    return;
+                  }
                   if (selectedVariant) {
                     addToCart({ product: product._id, variant: selectedVariant._id, quantity });
                   }

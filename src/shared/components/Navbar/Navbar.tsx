@@ -41,20 +41,21 @@ export function Navbar() {
             <Search size={18} />
           </Link>
           {isAuthenticated && (
-            <Link to="/wishlist" className={styles.iconBtn} aria-label="Wishlist">
-              <Heart size={18} />
-              {wishlistCount > 0 && <span className={styles.cartBadge}>{wishlistCount}</span>}
-            </Link>
+            <>
+              <Link to="/wishlist" className={styles.iconBtn} aria-label="Wishlist">
+                <Heart size={18} />
+                {wishlistCount > 0 && <span className={styles.cartBadge}>{wishlistCount}</span>}
+              </Link>
+              <Link to="/cart" className={styles.iconBtn} aria-label="Cart">
+                <ShoppingBag size={18} />
+                {cartCount > 0 && <span className={styles.cartBadge}>{cartCount}</span>}
+              </Link>
+              <Link to="/profile" className={styles.iconBtn} aria-label="Profile">
+                <User size={18} />
+              </Link>
+            </>
           )}
-          <Link to="/cart" className={styles.iconBtn} aria-label="Cart">
-            <ShoppingBag size={18} />
-            {cartCount > 0 && <span className={styles.cartBadge}>{cartCount}</span>}
-          </Link>
-          {isAuthenticated ? (
-            <Link to="/profile" className={styles.iconBtn} aria-label="Profile">
-              <User size={18} />
-            </Link>
-          ) : (
+          {!isAuthenticated && (
             <Link to="/login" className={styles.loginLink}>Login</Link>
           )}
         </div>
@@ -72,9 +73,6 @@ export function Navbar() {
               <NavLink to="/wishlist" className={styles.mobileLink} onClick={() => setMobileOpen(false)}>Wishlist</NavLink>
               <NavLink to="/profile" className={styles.mobileLink} onClick={() => setMobileOpen(false)}>Profile</NavLink>
             </>
-          )}
-          {!isAuthenticated && (
-            <NavLink to="/login" className={styles.mobileLink} onClick={() => setMobileOpen(false)}>Login</NavLink>
           )}
         </div>
       )}
