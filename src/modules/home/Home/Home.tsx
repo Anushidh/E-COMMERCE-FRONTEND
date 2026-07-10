@@ -178,7 +178,7 @@ export default function Home() {
           />
           <CategoryCard
             title="Shoes"
-            href="/shop?category=Shoes"
+            href="/shop?category=Sneakers"
             image={accessoriesImg}
             delay={0.3}
           />
