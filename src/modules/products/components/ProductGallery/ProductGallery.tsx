@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, MouseEvent } from 'react';
 import styles from './ProductGallery.module.css';
 
 interface ProductGalleryProps {
@@ -8,6 +8,27 @@ interface ProductGalleryProps {
 
 export function ProductGallery({ images, name }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [zoomStyle, setZoomStyle] = useState({});
+  const [isZooming, setIsZooming] = useState(false);
+
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    
+    setZoomStyle({
+      transformOrigin: `${x}% ${y}%`,
+    });
+  };
+
+  const handleMouseEnter = () => setIsZooming(true);
+  const handleMouseLeave = () => {
+    setIsZooming(false);
+    // Reset to center smoothly when mouse leaves
+    setZoomStyle({
+      transformOrigin: 'center center',
+    });
+  };
 
   if (images.length === 0) {
     return (
@@ -19,11 +40,17 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
 
   return (
     <div className={styles.gallery}>
-      <div className={styles.mainImage}>
+      <div 
+        className={styles.mainImage}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <img
           src={images[activeIndex]}
           alt={`${name} - Image ${activeIndex + 1}`}
-          className={styles.image}
+          className={`${styles.image} ${isZooming ? styles.zoomed : ''}`}
+          style={zoomStyle}
         />
       </div>
       {images.length > 1 && (
