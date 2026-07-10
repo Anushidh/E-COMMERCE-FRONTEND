@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router';
-import { useAdminOrders, useUpdateOrderStatus, useHandleReturn } from '@/hooks/useAdmin';
+import { useAdminOrders, useUpdateOrderStatus, useHandleReturn, useHandleCancellation } from '@/hooks/useAdmin';
 import { Button, Badge, TableSkeleton, Select } from '@shared/components';
 import { getOrderStatusBadgeVariant } from '@/shared/utils/badge';
 import styles from './Orders.module.css';
@@ -32,6 +32,7 @@ export default function Orders() {
   const { data, isLoading } = useAdminOrders({ page, status: statusFilter || undefined });
   const { mutate: updateStatus } = useUpdateOrderStatus();
   const { mutate: handleReturn } = useHandleReturn();
+  const { mutate: handleCancellation } = useHandleCancellation();
 
   return (
     <>
@@ -77,6 +78,18 @@ export default function Orders() {
                       {s}
                     </Button>
                   ))}
+                  {order.orderStatus === 'Cancel Requested' && (
+                    <>
+                      <Button size="sm" loading={updatingId === `${order._id}-cancel-approve`} onClick={() => {
+                        setUpdatingId(`${order._id}-cancel-approve`);
+                        handleCancellation({ id: order._id, action: 'approve' }, { onSettled: () => setUpdatingId(null) });
+                      }}>Approve</Button>
+                      <Button size="sm" variant="ghost" loading={updatingId === `${order._id}-cancel-reject`} onClick={() => {
+                        setUpdatingId(`${order._id}-cancel-reject`);
+                        handleCancellation({ id: order._id, action: 'reject' }, { onSettled: () => setUpdatingId(null) });
+                      }}>Reject</Button>
+                    </>
+                  )}
                   {order.orderStatus === 'Return Requested' && (
                     <>
                       <Button size="sm" loading={updatingId === `${order._id}-approve`} onClick={() => {
