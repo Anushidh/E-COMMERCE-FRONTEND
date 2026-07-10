@@ -86,7 +86,7 @@ export default function Signup() {
               fullWidth
               size="lg"
               leftIcon={<GoogleIcon />}
-              onClick={() => { window.location.href = '/api/auth/google'; }}
+              onClick={() => { window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`; }}
             >
               Continue with Google
             </Button>
