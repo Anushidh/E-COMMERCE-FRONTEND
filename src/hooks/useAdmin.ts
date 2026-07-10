@@ -58,7 +58,7 @@ export function useUpdateOrderStatus() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) => adminService.updateOrderStatus(id, status),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'orders'] }); toast.success('Status updated'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'orders'] }); qc.invalidateQueries({ queryKey: ['admin', 'order'] }); toast.success('Status updated'); },
     onError: (e: AxiosError<ErrorResponse>) => toast.error(errMsg(e)),
   });
 }

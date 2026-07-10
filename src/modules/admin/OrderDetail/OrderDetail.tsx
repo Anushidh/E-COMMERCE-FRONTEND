@@ -19,7 +19,7 @@ const NEXT_STATUS: Record<string, string[]> = {
 
 export default function AdminOrderDetail() {
   const { id } = useParams<{ id: string }>();
-  const { mutate: updateStatus, isPending: updating } = useUpdateOrderStatus();
+  const { mutate: updateStatus, isPending: updating, variables: updateVariables } = useUpdateOrderStatus();
   const { mutate: handleReturn } = useHandleReturn();
   const { mutate: handleCancellation } = useHandleCancellation();
 
@@ -101,7 +101,7 @@ export default function AdminOrderDetail() {
         {/* Actions */}
         <div className={styles.actions}>
           {NEXT_STATUS[order.orderStatus]?.map((s) => (
-            <Button key={s} size="sm" variant="secondary" loading={updating}
+            <Button key={s} size="sm" variant="secondary" loading={updating && updateVariables?.status === s}
               onClick={() => updateStatus({ id: order._id, status: s })}>
               Mark as {s}
             </Button>
